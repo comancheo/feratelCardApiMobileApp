@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jsqr/scanner.dart';
 import 'dart:html' as html;
-import 'dart:ui' as ui;
 
 void main() {
   runApp(MyApp());
@@ -12,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Akceptace karty',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -25,7 +24,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Akceptace karty'),
     );
   }
 }
@@ -65,19 +64,20 @@ class _MyHomePageState extends State<MyHomePage> {
   void _openScan() async {
     var code = await showDialog(
         context: context,
-        builder: (BuildContext context) {
-          // var height = MediaQuery.of(context).size.height;
-          // var width = MediaQuery.of(context).size.width;
+        builder: (context) {
+          var height = MediaQuery.of(context).size.height;
+          var width = MediaQuery.of(context).size.width;
           return AlertDialog(
             insetPadding: EdgeInsets.all(5),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            title: const Text('Scan QR Code'),
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            title: const Text('Načíst kartu'),
             content: Container(
-                // height: height - 20,
-                width: 640,
-                height: 480,
-                child: Scanner()),
+                width:width*0.5,
+                height:height*0.5,
+                child: Scanner(),
+            ),
           );
         });
     print("CODE: $code");
@@ -88,48 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       this.code = code;
-      _counter++;
-    });
-  }
-
-  void _captureImage() async {
-    var dataUrl = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          // var height = MediaQuery.of(context).size.height;
-          // var width = MediaQuery.of(context).size.width;
-          return AlertDialog(
-            insetPadding: EdgeInsets.all(5),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            title: const Text('Scan QR Code'),
-            content: Container(
-                // height: height - 20,
-                width: 640,
-                height: 480,
-                child: Scanner(
-                  clickToCapture: true,
-                )),
-          );
-        });
-    print("IMG URL: $dataUrl");
-    html.DivElement vidDiv =
-        html.DivElement(); // need a global for the registerViewFactory
-
-    // ignore: UNDEFINED_PREFIXED_NAME
-    ui.platformViewRegistry.registerViewFactory("cap", (int id) => vidDiv);
-
-    img = new html.ImageElement();
-    img.src = dataUrl;
-    vidDiv.children = [img];
-    // html.document.body.children.add(img);
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      // this.code = code;
       _counter++;
     });
   }
@@ -172,13 +130,13 @@ class _MyHomePageState extends State<MyHomePage> {
               future: camAvailableF,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Text("ERROR: ${snapshot.error}");
+                  return Text("Chyba: ${snapshot.error}");
                 }
                 if (snapshot.hasData) {
                   if (snapshot.data) {
-                    return (Text("Camera is available"));
+                    return (Text("Je dostupná kamera"));
                   }
-                  return (Text("No camera available"));
+                  return (Text("Verze bez kamery"));
                 } else {
                   return CircularProgressIndicator();
                 }
@@ -188,41 +146,23 @@ class _MyHomePageState extends State<MyHomePage> {
               '$code',
               style: Theme.of(context).textTheme.headline4,
             ),
-            // FutureBuilder<List<dynamic>>(
-            //   future: sourcesF,
-            //   builder: (context, snapshot) {
-            //     if (snapshot.hasError) {
-            //       return Text("ERROR: ${snapshot.error}");
-            //     }
-            //     if (snapshot.hasData) {
-            //       List<Widget> children = [];
-            //       for (final e in snapshot.data) {
-            //         children.add(Text(e.toString()));
-            //       }
-            //       return Center(child: Column(children: children));
-            //     } else {
-            //       // We can show the loading view until the data comes back.
-            //       return CircularProgressIndicator();
-            //     }
-            //   },
-            // )
             SizedBox(height: 10),
             MaterialButton(
-              child: Text("Scan QR Code"),
+              child: Text("Načíst kartu"),
               onPressed: _openScan,
             ),
             SizedBox(height: 10),
             if (img != null)
               SizedBox(
-                  width: 640,
-                  height: 480,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.9,
                   child: HtmlElementView(viewType: "cap")),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
          onPressed: _openScan,
-         tooltip: 'Scan',
+         tooltip: 'Skenuj QR',
          child: Icon(Icons.camera_alt),
       ),
     );
