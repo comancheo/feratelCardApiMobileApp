@@ -43,9 +43,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _inputCodeKey = GlobalKey<FormFieldState>();
   int counter = 0;
+  bool codeHandled = false;
+  bool camAvailable = false;
   TextEditingController txt = TextEditingController();
   String code;
   String formMessage = "";
+  FocusNode _focus = FocusNode();
   // Future<List<dynamic>> sourcesF;
   Future<bool> camAvailableF;
   html.ImageElement img;
@@ -53,8 +56,25 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _focus.addListener(_onFocusChange);
     // sourcesF = navigator.mediaDevices.getSources();
     camAvailableF = Scanner.cameraAvailable();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _focus.removeListener(_onFocusChange);
+    _focus.dispose();
+  }
+
+  void _onFocusChange() {
+    if(_focus.hasFocus && this.codeHandled){
+      setState(() {
+        this.codeHandled = false;
+        this.txt.text="";
+      });
+    }
   }
 
   void _openScan() async {
@@ -82,9 +102,11 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      this.code = code;
-      this.txt.text = code;
-      this.handleSubmitCode(code);
+      if (code) {
+        this.code = code;
+        this.txt.text = code;
+        this.handleSubmitCode(code);
+      }
     });
   }
 
@@ -112,10 +134,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
                 if (snapshot.hasData) {
                   if (snapshot.data) {
-                    return (Text("Je dostupná kamera"));
+                    this.camAvailable=true;
+                    return (Text("Můžete naskenovat kód kamerou"));
                   }
+                  this.camAvailable=false;
                   return (Text("Verze bez kamery"));
                 } else {
+                  this.camAvailable=false;
                   return CircularProgressIndicator();
                 }
               },
@@ -123,6 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextFormField(
               // The validator receives the text that the user has entered.
               key:_inputCodeKey,
+              focusNode: _focus,
               autofocus: true,
               controller: this.txt,
               onFieldSubmitted: (value) {
@@ -143,12 +169,13 @@ class _MyHomePageState extends State<MyHomePage> {
          onPressed: _openScan,
          tooltip: 'Skenuj QR',
          child: Icon(Icons.qr_code),
-      ),
+        ),
     );
   }
   void handleSubmitCode(code){
     setState(() {
       this.counter++;
+      this.codeHandled = true;
     });
     if ((this.counter % 2)==0) {
       ScaffoldMessenger.of(context).showSnackBar(
