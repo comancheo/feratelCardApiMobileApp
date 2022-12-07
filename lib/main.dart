@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jsqr/scanner.dart';
 import 'dart:html' as html;
+import 'package:oauth2_client/oauth2_client.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Akceptace karty',
       theme: ThemeData(
         primarySwatch: Colors.red,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Akceptace karty'),
     );
@@ -39,8 +41,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final GlobalKey _inputCodeKey = GlobalKey<FormFieldState>();
+  int counter = 0;
+  TextEditingController txt = TextEditingController();
   String code;
+  String formMessage = "";
   // Future<List<dynamic>> sourcesF;
   Future<bool> camAvailableF;
   html.ImageElement img;
@@ -63,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))
             ),
-            title: const Text('Načíst kartu'),
+            title: const Text('Načtěte kód'),
             content: Container(
                 width:width*0.5,
                 height:height*0.5,
@@ -71,7 +76,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           );
         });
-    print("CODE: $code");
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -79,7 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       this.code = code;
-      _counter++;
+      this.txt.text = code;
+      this.handleSubmitCode(code);
     });
   }
 
@@ -93,28 +98,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             FutureBuilder<bool>(
@@ -133,29 +120,44 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
               },
             ),
-            Text(
-              '$code',
-              style: Theme.of(context).textTheme.headline4,
+            TextFormField(
+              // The validator receives the text that the user has entered.
+              key:_inputCodeKey,
+              autofocus: true,
+              controller: this.txt,
+              onFieldSubmitted: (value) {
+                this.handleSubmitCode(value);
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Vložte kód';
+                }
+                return null;
+              },
             ),
-            SizedBox(height: 10),
-            MaterialButton(
-              child: Text("Načíst kartu"),
-              onPressed: _openScan,
-            ),
-            SizedBox(height: 10),
-            if (img != null)
-              SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.height * 0.9,
-                  child: HtmlElementView(viewType: "cap")),
+            Text(this.formMessage),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
          onPressed: _openScan,
          tooltip: 'Skenuj QR',
-         child: Icon(Icons.camera_alt),
+         child: Icon(Icons.qr_code),
       ),
     );
+  }
+  void handleSubmitCode(code){
+    setState(() {
+      this.counter++;
+    });
+    if ((this.counter % 2)==0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Karta je validní!'), backgroundColor: Colors.green,),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Karta není validní!'), backgroundColor: Colors.redAccent,),
+      );
+    }
   }
 }
