@@ -12,8 +12,54 @@ class DashboardScreen extends StatefulWidget {
   @override
   _DashboardScreen createState() => _DashboardScreen();
 }
-
-
+class AlertWindow {
+  AlertWindow({required this.context, this.show, this.type, this.message, this.color, this.title, this.icon})
+      : assert(show != null), assert(type != null), assert(message != null), assert(color != null), assert(title != null), assert(icon != null);
+  BuildContext context;
+  bool? show = false;
+  String? type;
+  String? message;
+  Color? color;
+  String? title;
+  IconData? icon;
+  Widget getWidget(){
+    if ((this.show??false)) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          var height = MediaQuery.of(context).size.height;
+          var width = MediaQuery.of(context).size.width;
+          var ret = AlertDialog(
+            insetPadding: EdgeInsets.all(5),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            icon: Icon(this.icon),
+            iconColor: Colors.white,
+            backgroundColor: this.color,
+            title: Text(this.title??""),
+            content: Container(
+              width: width * 0.5,
+              height: height * 0.5,
+              child: Text(this.message??"")
+            ),
+          );
+          this.clearProperties();
+          return ret;
+        }
+      );
+    }
+    return SizedBox.shrink();
+  }
+  clearProperties() {
+    this.title = "";
+    this.type = "error";
+    this.show = false;
+    this.icon = null;
+    this.message = null;
+    this.color = null;
+  }
+}
 class _DashboardScreen extends State<DashboardScreen> {
   final GlobalKey _inputCodeKey = GlobalKey<FormFieldState>();
   int counter = 0;
@@ -21,8 +67,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   TextEditingController inputCodeController = TextEditingController();
   String? code;
   FocusNode _focus = FocusNode();
-
-  // Future<List<dynamic>> sourcesF;
+  AlertWindow? alertWindow;
   Future<bool>? camAvailableF;
   html.ImageElement? img;
 
@@ -41,14 +86,12 @@ class _DashboardScreen extends State<DashboardScreen> {
   }
 
   void _onFocusChange() {
-    if (_focus.hasFocus && this.codeHandled) {
-      setState(() {
-      });
-    }
+
   }
 
   @override
   Widget build(BuildContext context) {
+    AlertWindow alert = this.alertWindow??AlertWindow(context: context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Akceptace karty: Akceptuj kartu"),
@@ -74,6 +117,7 @@ class _DashboardScreen extends State<DashboardScreen> {
                 }
               },
             ),
+            alert.getWidget(),
             TextFormField(
               // The validator receives the text that the user has entered.
               key: _inputCodeKey,
@@ -132,7 +176,31 @@ class _DashboardScreen extends State<DashboardScreen> {
   }
 
   bool isCardValid() {
-    return Communication().checkCardValidity(this.code??"");
+    return Communication().checkCardValidity(this.code??"", (result){
+      AlertWindow alert = AlertWindow(context: context);
+        if (result) {
+          alert = AlertWindow(
+            context: context,
+            show: true,
+            message: "Karta je validní",
+            color: Colors.greenAccent,
+            title: "Karta je validní",
+            icon: Icons.check
+          );
+        } else {
+          alert = AlertWindow(
+            context: context,
+            show: true,
+            message: "Karta není validní",
+            color: Colors.redAccent,
+            title: "Karta není validní",
+            icon: Icons.crisis_alert
+          );
+        }
+        setState(() {
+          this.alertWindow = alert;
+        });
+    });
   }
 
   void handleSubmitCode() async {

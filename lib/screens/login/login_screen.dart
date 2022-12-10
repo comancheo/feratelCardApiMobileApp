@@ -2,11 +2,13 @@ import 'package:example/util/communication.dart';
 import 'package:flutter/material.dart';
 import '/main.dart';
 import '/screens/parts/parts.dart';
+import 'package:auto_route/auto_route.dart';
+import '/routes/router.gr.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key, this.onLoginCallback})
       : super(key: key);
-  Function(bool loggedIn)? onLoginCallback;
+  final Function(bool loggedIn)? onLoginCallback;
   @override
   _LoginScreen createState() => _LoginScreen(onLoginCallback:this.onLoginCallback);
 }
@@ -14,9 +16,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreen extends State<LoginScreen> {
   _LoginScreen({this.onLoginCallback});
   Function(bool loggedIn)? onLoginCallback;
-
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  String loginProgress = 'showForm';
+  String error = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +29,16 @@ class _LoginScreen extends State<LoginScreen> {
       ),
       drawer: DrawerPart(context),
       body: SingleChildScrollView(
-        child: Form(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:showBody()
+        ),
+      ),
+    );
+  }
+
+  Form loginForm(){
+    return Form(
             child: Column(
             children: <Widget>[
               Padding(
@@ -92,15 +104,47 @@ class _LoginScreen extends State<LoginScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
+        );
+  }
+  CircularProgressIndicator loadingCircle(){
+    return CircularProgressIndicator();
+  }
+  Text errorText(String errorText){
+    return Text(errorText, style: TextStyle(color: Colors.redAccent, fontSize: 50));
+  }
+  List<Widget> showBody(){
+    List<Widget> members = [];
+    if (this.error != "") {
+      members.add(this.errorText(this.error));
+    }
+    if (this.loginProgress == "loading") {
+      members.add(this.loadingCircle());
+    }
+    if (this.loginProgress == "showForm") {
+      members.add(this.loginForm());
+    }
+    return members;
   }
   handleSubmitLogin(){
-    Communication().logIn({"login":{"username":this.usernameController.text, "password":this.passwordController.text}});
-    if (Communication().amILoggedIn()) {
-      MyApp.of(context).authService.authenticated = Communication().amILoggedIn();
-      onLoginCallback?.call(MyApp.of(context).authService.authenticated);
-    }
+    setState(() {
+      this.loginProgress = "loading";
+    });
+    dynamic data = {"login":{"username":this.usernameController.text, "password":this.passwordController.text}};
+    Communication().logIn(data,(result){
+      var error = "";
+      if (Communication().amILoggedIn()) {
+        MyApp.of(context).authService.authenticated = Communication().amILoggedIn();
+        onLoginCallback?.call(MyApp.of(context).authService.authenticated);
+        if (onLoginCallback == null) {
+          AutoRouter.of(context).push(DashboardRoute());
+        }
+      } else {
+        error = "Špatné jméno nebo heslo!";
+      }
+      setState(() {
+        this.loginProgress = 'showForm';
+        this.error = error;
+      });
+    });
   }
 }

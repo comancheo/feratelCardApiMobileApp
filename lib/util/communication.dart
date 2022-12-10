@@ -11,15 +11,17 @@ class Communication {
   Communication._internal();
   bool loggedIn = false;
 
-  logIn(dynamic login) {
-    dynamic response = this.callServer('login/',login);
-    if (response['login']=='OK') {
-      print('OK');
-      this.loggedIn = true;
-    } else {
-      this.loggedIn = false;
-    };
-    return this.amILoggedIn();
+  logIn(dynamic login, Function callable) {
+    Future<dynamic> response = this.callServer('login/',login);
+    return response.then((r){
+      if (r['login']=='OK') {
+        this.loggedIn = true;
+      } else {
+        this.loggedIn = false;
+      };
+      callable.call(this.amILoggedIn());
+      return this.amILoggedIn();
+    });
   }
 
 
@@ -40,18 +42,21 @@ class Communication {
     return false;
   }
 
-  checkCardValidity(String code){
+  checkCardValidity(String code, Function callback){
     dynamic data = {'checkPointId':'2db36571-3b83-4c46-9341-326a4ecacb55', 'identifier':code};
     final response = this.callServer("checkcard/",data);
-    if (response['card']=='OK') {
-      return true;
-    }
-    return false;
+    response.then((r){
+      var result = false;
+      if (r['card']=='OK') {
+        result = true;
+      }
+      callback.call(result);
+    });
   }
 
-  dynamic callServer(String url, dynamic parameters) {
+  dynamic callServer(String url, dynamic parameters) async {
     try {
-      final response = http.post(
+      final response = await http.post(
         Uri.parse('/feratelAPI.php/'+url),
         headers: <String, String>{
           'Content-Type':'application/json; charset=UTF-8',
@@ -59,12 +64,10 @@ class Communication {
         body: jsonEncode(parameters),
         encoding: Encoding.getByName("utf-8"),
       );
-      return response.then((r){
-        var data = jsonDecode(r.body);
-        if (data["status"] == "OK") {
-          return data;
-        }
-      });
+      dynamic data = jsonDecode(response.body);
+      if (data['status'] == 'OK') {
+        return data;
+      }
     } catch (e) {
       //TODO Error communication
     }
