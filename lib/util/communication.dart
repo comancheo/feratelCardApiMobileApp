@@ -11,9 +11,10 @@ class Communication {
   Communication._internal();
   bool loggedIn = false;
 
-  logIn(dynamic login){
-    var response = this.callServer('login/',login);
+  logIn(dynamic login) {
+    dynamic response = this.callServer('login/',login);
     if (response['login']=='OK') {
+      print('OK');
       this.loggedIn = true;
     } else {
       this.loggedIn = false;
@@ -41,18 +42,16 @@ class Communication {
 
   checkCardValidity(String code){
     dynamic data = {'checkPointId':'2db36571-3b83-4c46-9341-326a4ecacb55', 'identifier':code};
-    final response =  this.callServer("checkcard/",data);
+    final response = this.callServer("checkcard/",data);
     if (response['card']=='OK') {
       return true;
     }
     return false;
   }
 
-  dynamic callServer(String url, dynamic parameters) async {
+  dynamic callServer(String url, dynamic parameters) {
     try {
-      print(url);
-      print(parameters);
-      final response = await http.post(
+      final response = http.post(
         Uri.parse('/feratelAPI.php/'+url),
         headers: <String, String>{
           'Content-Type':'application/json; charset=UTF-8',
@@ -60,14 +59,15 @@ class Communication {
         body: jsonEncode(parameters),
         encoding: Encoding.getByName("utf-8"),
       );
-      print(response.body);
-      var data = jsonDecode(response.body);
-      if (data["status"] == "OK") {
-        return data;
-      }
+      return response.then((r){
+        var data = jsonDecode(r.body);
+        if (data["status"] == "OK") {
+          return data;
+        }
+      });
     } catch (e) {
       //TODO Error communication
     }
-    return [];
+    return {'login':'ERROR'};
   }
 }

@@ -62,10 +62,10 @@ class AppRouter extends _i5.RootStackRouter {
 
 /// generated route for [_i1.LoginScreen]
 class LoginRoute extends _i5.PageRouteInfo<LoginRouteArgs> {
-  LoginRoute({_i9.Key? key, required dynamic Function(bool) onLoginCallback})
+  LoginRoute({_i9.Key? key, dynamic Function(bool)? onLoginCallback})
       : super(name,
             path: 'login',
-            args: LoginRouteArgs(key: key, onLoginCallback: onLoginCallback));
+            args: LoginRouteArgs(key: key, onLoginCallback: onLoginCallback??(_){}));
 
   static const String name = 'LoginRoute';
 }

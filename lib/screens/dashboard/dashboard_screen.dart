@@ -19,7 +19,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   final GlobalKey _inputCodeKey = GlobalKey<FormFieldState>();
   int counter = 0;
   bool codeHandled = false;
-  TextEditingController txt = TextEditingController();
+  TextEditingController inputCodeController = TextEditingController();
   String? code;
   FocusNode _focus = FocusNode();
 
@@ -133,7 +133,7 @@ class _DashboardScreen extends State<DashboardScreen> {
               key: _inputCodeKey,
               focusNode: _focus,
               autofocus: true,
-              controller: this.txt,
+              controller: this.inputCodeController,
               decoration: const InputDecoration(
                  labelText: 'Číslo karty',
               ),
@@ -180,7 +180,7 @@ class _DashboardScreen extends State<DashboardScreen> {
           );
         });
     setState(() {
-      this.code = this.txt.text = code;
+      this.code = this.inputCodeController.text = code;
     });
     this.handleSubmitCode();
   }
