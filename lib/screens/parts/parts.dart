@@ -1,0 +1,1 @@
+export '/screens/parts/drawer_part.dart';

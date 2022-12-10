@@ -1,7 +1,6 @@
 import 'package:example/routes/router.gr.dart';
 import 'package:flutter/material.dart';
 import '/routes/route_guard.dart';
-import '/screens/home/home_screen.dart';
 import '/util/auth_service.dart';
 
 void main() {

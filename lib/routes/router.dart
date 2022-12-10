@@ -7,7 +7,7 @@ import '/screens/login/login_screen.dart';
 
 @MaterialAutoRouter(
   routes: <AutoRoute>[
-    AutoRoute(page: LoginScreen, name: 'LoginRoute', path: 'login'),
+    AutoRoute(page: LoginScreen, name: 'LoginRoute', path: '/login'),
     AutoRoute(
       page: HomeScreen,
       name: 'HomeRoute',
