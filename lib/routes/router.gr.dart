@@ -71,11 +71,11 @@ class LoginRoute extends _i5.PageRouteInfo<LoginRouteArgs> {
 }
 
 class LoginRouteArgs {
-  const LoginRouteArgs({this.key, required this.onLoginCallback});
+  const LoginRouteArgs({this.key, this.onLoginCallback});
 
   final _i9.Key? key;
 
-  final dynamic Function(bool) onLoginCallback;
+  final dynamic Function(bool)? onLoginCallback;
 }
 
 /// generated route for [_i2.HomeScreen]
