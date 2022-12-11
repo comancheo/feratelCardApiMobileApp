@@ -100,6 +100,7 @@ class _LoginScreen extends State<LoginScreen> {
       context:context,
       color:Colors.redAccent,
       title:"Nepodařilo se Vás přihlásit",
+      icon:Icons.warning,
       message: errorText,
     ).getWidget();
   }

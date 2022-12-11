@@ -90,6 +90,7 @@ class Communication {
           message: "Chyba komunikace, zkuste to pouzději",
           color:Colors.redAccent,
           title: "Chyba komunikace",
+          icon: Icons.warning
         ).getWidget();
       }
       //TODO Error communication
