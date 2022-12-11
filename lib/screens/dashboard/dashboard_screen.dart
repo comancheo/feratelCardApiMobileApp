@@ -66,8 +66,8 @@ class _DashboardScreen extends State<DashboardScreen> {
                 onSubmit: (_){
                   setState(() {
                     this.code = this.inputCodeController.text;
+                    this.handleSubmitCode();
                   });
-                  this.handleSubmitCode();
                 }
             ).getWidget(),
           ],
@@ -82,7 +82,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   }
 
   void _openScan() async {
-    var code = await showDialog(
+    var code =  showDialog(
         context: context,
         builder: (context) {
           var height = MediaQuery.of(context).size.height;
@@ -99,10 +99,12 @@ class _DashboardScreen extends State<DashboardScreen> {
             ),
           );
         });
-    setState(() {
-      this.code = this.inputCodeController.text = code;
+    code.then((c){
+      setState(() {
+        this.code = this.inputCodeController.text = c;
+        this.handleSubmitCode();
+      });
     });
-    this.handleSubmitCode();
   }
   List<Widget> showBody(){
     List<Widget> members = [];
