@@ -8,7 +8,7 @@ class feratelAPI
     const GRANT_TYPE = "password";
     const API_TENANT = "itest";
     const API_URL = "https://card-check-api.feratel.com:443/v1/".self::API_TENANT."/secure/checkpoints/";
-    const ALLOWED_METHODS = ['handleLogin','handleCheckcard'];
+    const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints'];
 
     private $json = [];
     public function __construct(){
@@ -29,6 +29,7 @@ class feratelAPI
             $this->setSession('login', $this->getJson('login'));
             return $this->setResponse('OK', [
                 'login'=>'OK',
+                'checkpoint' => $this->getFirstCheckpoint()['id'],
                 'secToken'=>session_id()
             ]);
         } else {
@@ -63,7 +64,16 @@ class feratelAPI
             'cardValidTo' => $to,
         ]);
     }
-
+    public function handleCheckpoints(){
+        return $this->getFirstCheckpoint()['id'];
+    }
+    private function getFirstCheckpoint(){
+        $checkpoints = $this->getCheckpoints();
+        return $checkpoints[0];
+    }
+    private function getCheckpoints(){
+        return $this->getApiResponse([]);
+    }
     private function getApiResponse($params){
         $header = [
             'Accept: application/json',
@@ -170,10 +180,11 @@ class feratelAPI
     }
 
     private function setResponse($status, array $data = []){
-        return [
-            "status" => $status,
-            ...$data
-        ];
+        $response = ["status" => $status];
+        foreach ($data as $key => $val) {
+            $response[$key]=$val;
+        }
+        return $response;
     }
 
     private function getResponse(){

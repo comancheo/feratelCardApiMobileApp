@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 
 class Communication {
 
   static final Communication _communication = Communication._internal();
+  final LocalStorage storage = new LocalStorage('feratelAppLogin');
   factory Communication() {
     return _communication;
   }
@@ -15,6 +16,9 @@ class Communication {
     Future<dynamic> response = this.callServer('login/',login);
     return response.then((r){
       if (r['login']=='OK') {
+        this.storage.setItem("login", login);
+        this.storage.setItem("checkpoint", r['checkpoint']);
+        this.storage.setItem("secToken", r['secToken']);
         this.loggedIn = true;
       } else {
         this.loggedIn = false;
@@ -43,7 +47,10 @@ class Communication {
   }
 
   checkCardValidity(String code, Function callback){
-    dynamic data = {'checkPointId':'2db36571-3b83-4c46-9341-326a4ecacb55', 'identifier':code};
+    dynamic data = {
+      'checkPointId': this.storage.getItem("checkpoint"),
+      'identifier':code
+    };
     final response = this.callServer("checkcard/",data);
     response.then((r){
       var result = false;

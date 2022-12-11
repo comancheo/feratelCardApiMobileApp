@@ -211,21 +211,5 @@ class _DashboardScreen extends State<DashboardScreen> {
       return;
     }
     bool isValid = await this.isCardValid();
-
-    if (isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Karta je validní!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Karta není validní!'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    }
   }
 }
