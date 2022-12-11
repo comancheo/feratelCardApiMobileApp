@@ -50,7 +50,7 @@ class _LoginScreen extends State<LoginScreen> {
                       /*decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(50.0)),*/
-                      child: Image.asset('asset/images/logo-vychodnikrkonose-color.svg')),
+                      child: Image.asset('assets/images/snezka.png')),
                 ),
               ),inputTextField(
                 label:"Jméno",

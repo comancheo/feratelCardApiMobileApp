@@ -136,6 +136,7 @@ class _DashboardScreen extends State<DashboardScreen> {
         setState(() {
           this.alertWindow = alert;
           this.loading = false;
+          this.inputCodeController.text = "";
         });
     });
   }
