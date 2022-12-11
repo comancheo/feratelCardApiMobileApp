@@ -119,7 +119,7 @@ class _DashboardScreen extends State<DashboardScreen> {
             context: context,
             show: true,
             message: "Karta je validní",
-            color: Colors.greenAccent,
+            color: Colors.green,
             title: "Karta je validní",
             icon: Icons.check
           );
