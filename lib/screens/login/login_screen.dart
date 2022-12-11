@@ -25,7 +25,7 @@ class _LoginScreen extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Login Page"),
+        title: Text("Akceptace karty: Přihlášení"),
       ),
       drawer: DrawerPart(context),
       body: SingleChildScrollView(
@@ -52,37 +52,25 @@ class _LoginScreen extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(50.0)),*/
                       child: Image.asset('asset/images/logo-vychodnikrkonose-color.svg')),
                 ),
-              ),
-              Padding(
-                //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: TextField(
-                  controller: this.usernameController,
-                  onSubmitted: (_){
-                    this.handleSubmitLogin();
-                  },
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                      hintText: 'Enter valid email id as abc@gmail.com'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                    left: 15.0, right: 15.0, top: 15, bottom: 0),
-                //padding: EdgeInsets.symmetric(horizontal: 15),
-                child: TextField(
-                  onSubmitted: (_) {
-                    this.handleSubmitLogin();
-                  },
-                  controller: this.passwordController,
+              ),inputTextField(
+                label:"Jméno",
+                controller:this.usernameController,
+                hint:"Vložte jméno",
+                obscureText: false,
+                onSubmit: (_) {
+                  this.handleSubmitLogin();
+                },
+
+              ).getWidget(),
+              inputTextField(
+                  label: "Heslo",
+                  controller:this.passwordController,
+                  hint:"Vložte heslo",
                   obscureText: true,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password',
-                      hintText: 'Enter secure password'),
-                ),
-              ),
+                  onSubmit: (_) {
+                    this.handleSubmitLogin();
+                  }
+              ).getWidget(),
               SizedBox(height:50),
               Container(
                 height: 50,
@@ -91,7 +79,7 @@ class _LoginScreen extends State<LoginScreen> {
                     color: Colors.redAccent, borderRadius: BorderRadius.circular(20)),
                 child: MaterialButton(
                   onPressed: () {
-                    //TODO What to do after login
+                    this.handleSubmitLogin();
                   },
                   child: Text(
                     'Login',
@@ -106,19 +94,23 @@ class _LoginScreen extends State<LoginScreen> {
           ),
         );
   }
-  CircularProgressIndicator loadingCircle(){
-    return CircularProgressIndicator();
-  }
-  Text errorText(String errorText){
-    return Text(errorText, style: TextStyle(color: Colors.redAccent, fontSize: 50));
+  Widget errorText(String errorText){
+    return AlertWindow(
+      show:true,
+      context:context,
+      color:Colors.redAccent,
+      title:"Nepodařilo se Vás přihlásit",
+      message: errorText,
+    ).getWidget();
   }
   List<Widget> showBody(){
     List<Widget> members = [];
     if (this.error != "") {
       members.add(this.errorText(this.error));
+      this.error = "";
     }
     if (this.loginProgress == "loading") {
-      members.add(this.loadingCircle());
+      members.add(loadingCircle());
     }
     if (this.loginProgress == "showForm") {
       members.add(this.loginForm());

@@ -13,7 +13,7 @@ class AboutScreen extends StatelessWidget {
       drawer: DrawerPart(context),
       body: Center(
         child: Text(
-          'This is our about screen',
+          'Pro používání této aplikace budete potřebovat jméno a heslo. Kód můžete naskenovat kamerou, nebo čtečkou.',
           style: TextStyle(
             fontSize: 16,
           ),
