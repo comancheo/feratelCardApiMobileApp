@@ -70,7 +70,7 @@ class Communication {
   dynamic callServer(String url, dynamic parameters) async {
     try {
       final response = await http.post(
-        Uri.parse('/feratelAPI.php/'+url),
+        Uri.parse('https://svazekapi.tabor-belun.cz/feratelAPI.php/'+url),
         headers: <String, String>{
           'Content-Type':'application/json; charset=UTF-8',
         },
@@ -83,15 +83,6 @@ class Communication {
         return data;
       }
     } catch (e) {
-      if (this.applicationKey.currentContext!=null) {
-        AlertWindow(
-          context: this.applicationKey.currentContext!,
-          show:true,
-          message: "Chyba komunikace, zkuste to pouzději",
-          color:Colors.redAccent,
-          title: "Chyba komunikace",
-        ).getWidget();
-      }
       //TODO Error communication
     }
     return {'login':'ERROR'};

@@ -27,7 +27,7 @@ class _DashboardScreen extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AlertWindow alert = this.alertWindow??AlertWindow(context: context);
+    AlertWindow alert = this.alertWindow??AlertWindow(context: context, show:false, type:"");
     return Scaffold(
       appBar: AppBar(
         title: Text("Akceptace karty: Akceptuj kartu"),
@@ -75,9 +75,7 @@ class _DashboardScreen extends State<DashboardScreen> {
             title: const Text('Načtěte kód')
           );
         });
-    setState(() {
-      this.code = this.inputCodeController.text = code;
-    });
+    this.code = this.inputCodeController.text = code;
     this.handleSubmitCode();
   }
   List<Widget> showBody(){
@@ -89,7 +87,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   }
   bool isCardValid() {
     return Communication().checkCardValidity(this.code??"", (result){
-      AlertWindow alert = AlertWindow(context: context);
+      AlertWindow alert;
         if (result) {
           alert = AlertWindow(
             context: context,
@@ -97,7 +95,8 @@ class _DashboardScreen extends State<DashboardScreen> {
             message: "Karta je validní",
             color: Colors.greenAccent,
             title: "Karta je validní",
-            icon: Icons.check
+            icon: Icons.check,
+            type:"",
           );
         } else {
           alert = AlertWindow(
@@ -106,7 +105,8 @@ class _DashboardScreen extends State<DashboardScreen> {
             message: "Karta není validní",
             color: Colors.redAccent,
             title: "Karta není validní",
-            icon: Icons.warning
+            icon: Icons.warning,
+            type:"",
           );
         }
         setState(() {

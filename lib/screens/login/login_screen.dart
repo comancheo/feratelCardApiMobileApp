@@ -57,6 +57,7 @@ class _LoginScreen extends State<LoginScreen> {
                 controller:this.usernameController,
                 hint:"Vložte jméno",
                 obscureText: false,
+                autofocus: false,
                 onSubmit: (_) {
                   this.handleSubmitLogin();
                 },
@@ -65,6 +66,7 @@ class _LoginScreen extends State<LoginScreen> {
               inputTextField(
                   label: "Heslo",
                   controller:this.passwordController,
+                  autofocus: false,
                   hint:"Vložte heslo",
                   obscureText: true,
                   onSubmit: (_) {
@@ -101,6 +103,8 @@ class _LoginScreen extends State<LoginScreen> {
       color:Colors.redAccent,
       title:"Nepodařilo se Vás přihlásit",
       message: errorText,
+      type:"",
+      icon:Icons.warning
     ).getWidget();
   }
   List<Widget> showBody(){
