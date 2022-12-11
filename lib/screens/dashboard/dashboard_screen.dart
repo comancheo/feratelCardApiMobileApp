@@ -130,7 +130,7 @@ class _DashboardScreen extends State<DashboardScreen> {
             message: "Karta není validní",
             color: Colors.redAccent,
             title: "Karta není validní",
-            icon: Icons.crisis_alert
+            icon: Icons.warning
           );
         }
         setState(() {

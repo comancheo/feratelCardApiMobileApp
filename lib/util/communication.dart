@@ -1,11 +1,17 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
+import '/screens/parts/parts.dart';
+import 'package:flutter/material.dart';
+
 
 class Communication {
 
   static final Communication _communication = Communication._internal();
   final LocalStorage storage = new LocalStorage('feratelAppLogin');
+  @override
+  final GlobalKey<NavigatorState> applicationKey = new GlobalKey<NavigatorState>();
   factory Communication() {
     return _communication;
   }
@@ -72,10 +78,20 @@ class Communication {
         encoding: Encoding.getByName("utf-8"),
       );
       dynamic data = jsonDecode(response.body);
+      print(this.applicationKey.currentContext);
       if (data['status'] == 'OK') {
         return data;
       }
     } catch (e) {
+      if (this.applicationKey.currentContext!=null) {
+        AlertWindow(
+          context: this.applicationKey.currentContext!,
+          show:true,
+          message: "Chyba komunikace, zkuste to pouzději",
+          color:Colors.redAccent,
+          title: "Chyba komunikace",
+        ).getWidget();
+      }
       //TODO Error communication
     }
     return {'login':'ERROR'};

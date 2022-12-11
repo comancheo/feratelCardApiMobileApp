@@ -118,6 +118,9 @@ class _LoginScreen extends State<LoginScreen> {
     return members;
   }
   handleSubmitLogin(){
+    if (this.usernameController.text == "" || this.passwordController.text == "") {
+      return;
+    }
     setState(() {
       this.loginProgress = "loading";
     });
