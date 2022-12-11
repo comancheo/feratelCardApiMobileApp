@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:jsqr/scanner.dart';
 import '/util/communication.dart';
 import '/screens/parts/parts.dart';
 
@@ -15,12 +14,10 @@ class _DashboardScreen extends State<DashboardScreen> {
   TextEditingController inputCodeController = TextEditingController();
   String? code;
   AlertWindow? alertWindow;
-  Future<bool>? camAvailableF;
 
   @override
   void initState() {
     super.initState();
-    camAvailableF = Scanner.cameraAvailable();
   }
 
   @override
@@ -40,22 +37,6 @@ class _DashboardScreen extends State<DashboardScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FutureBuilder<bool>(
-              future: camAvailableF,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Text("Chyba: ${snapshot.error}");
-                }
-                if (snapshot.hasData) {
-                  if (snapshot.data??false) {
-                    return (Text("Můžete naskenovat kód kamerou"));
-                  }
-                  return (Text("Verze bez kamery"));
-                } else {
-                  return CircularProgressIndicator();
-                }
-              },
-            ),
             ...this.showBody(),
             alert.getWidget(),
             inputTextField(
@@ -91,12 +72,7 @@ class _DashboardScreen extends State<DashboardScreen> {
             insetPadding: EdgeInsets.all(5),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            title: const Text('Načtěte kód'),
-            content: Container(
-              width: width * 0.5,
-              height: height * 0.5,
-              child: Scanner(),
-            ),
+            title: const Text('Načtěte kód')
           );
         });
     setState(() {
