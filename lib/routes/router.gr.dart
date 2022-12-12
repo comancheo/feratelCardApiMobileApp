@@ -11,29 +11,30 @@
 // ignore_for_file: type=lint
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i5;
-import 'package:flutter/material.dart' as _i6;
+import 'package:auto_route/auto_route.dart' as _i6;
+import 'package:flutter/material.dart' as _i7;
 
-import '../screens/about/about_screen.dart' as _i4;
+import '../screens/about/about_screen.dart' as _i5;
 import '../screens/dashboard/dashboard_screen.dart' as _i3;
 import '../screens/home/home_screen.dart' as _i2;
 import '../screens/login/login_screen.dart' as _i1;
-import 'route_guard.dart' as _i7;
+import '../screens/myqr/myqr.dart' as _i4;
+import 'route_guard.dart' as _i8;
 
-class AppRouter extends _i5.RootStackRouter {
+class AppRouter extends _i6.RootStackRouter {
   AppRouter({
-    _i6.GlobalKey<_i6.NavigatorState>? navigatorKey,
+    _i7.GlobalKey<_i7.NavigatorState>? navigatorKey,
     required this.routeGuard,
   }) : super(navigatorKey);
 
-  final _i7.RouteGuard routeGuard;
+  final _i8.RouteGuard routeGuard;
 
   @override
-  final Map<String, _i5.PageFactory> pagesMap = {
+  final Map<String, _i6.PageFactory> pagesMap = {
     LoginRoute.name: (routeData) {
       final args = routeData.argsAs<LoginRouteArgs>(
           orElse: () => const LoginRouteArgs());
-      return _i5.MaterialPageX<dynamic>(
+      return _i6.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i1.LoginScreen(
           key: args.key,
@@ -42,7 +43,7 @@ class AppRouter extends _i5.RootStackRouter {
       );
     },
     HomeRoute.name: (routeData) {
-      return _i5.MaterialPageX<dynamic>(
+      return _i6.MaterialPageX<dynamic>(
         routeData: routeData,
         child: const _i2.HomeScreen(),
       );
@@ -50,7 +51,7 @@ class AppRouter extends _i5.RootStackRouter {
     DashboardRoute.name: (routeData) {
       final args = routeData.argsAs<DashboardRouteArgs>(
           orElse: () => const DashboardRouteArgs());
-      return _i5.MaterialPageX<dynamic>(
+      return _i6.MaterialPageX<dynamic>(
         routeData: routeData,
         child: _i3.DashboardScreen(
           key: args.key,
@@ -58,30 +59,43 @@ class AppRouter extends _i5.RootStackRouter {
         ),
       );
     },
-    AboutRoute.name: (routeData) {
-      return _i5.MaterialPageX<dynamic>(
+    MyQRScreenRoute.name: (routeData) {
+      final args = routeData.argsAs<MyQRScreenRouteArgs>(
+          orElse: () => const MyQRScreenRouteArgs());
+      return _i6.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i4.AboutScreen(),
+        child: _i4.MyQRScreen(key: args.key),
+      );
+    },
+    AboutRoute.name: (routeData) {
+      return _i6.MaterialPageX<dynamic>(
+        routeData: routeData,
+        child: const _i5.AboutScreen(),
       );
     },
   };
 
   @override
-  List<_i5.RouteConfig> get routes => [
-        _i5.RouteConfig(
+  List<_i6.RouteConfig> get routes => [
+        _i6.RouteConfig(
           LoginRoute.name,
           path: '/login',
         ),
-        _i5.RouteConfig(
+        _i6.RouteConfig(
           HomeRoute.name,
           path: '/',
         ),
-        _i5.RouteConfig(
+        _i6.RouteConfig(
           DashboardRoute.name,
           path: '/dashboard',
           guards: [routeGuard],
         ),
-        _i5.RouteConfig(
+        _i6.RouteConfig(
+          MyQRScreenRoute.name,
+          path: '/myqr',
+          guards: [routeGuard],
+        ),
+        _i6.RouteConfig(
           AboutRoute.name,
           path: '/about',
         ),
@@ -90,9 +104,9 @@ class AppRouter extends _i5.RootStackRouter {
 
 /// generated route for
 /// [_i1.LoginScreen]
-class LoginRoute extends _i5.PageRouteInfo<LoginRouteArgs> {
+class LoginRoute extends _i6.PageRouteInfo<LoginRouteArgs> {
   LoginRoute({
-    _i6.Key? key,
+    _i7.Key? key,
     dynamic Function(bool)? onLoginCallback,
   }) : super(
           LoginRoute.name,
@@ -112,7 +126,7 @@ class LoginRouteArgs {
     this.onLoginCallback,
   });
 
-  final _i6.Key? key;
+  final _i7.Key? key;
 
   final dynamic Function(bool)? onLoginCallback;
 
@@ -124,7 +138,7 @@ class LoginRouteArgs {
 
 /// generated route for
 /// [_i2.HomeScreen]
-class HomeRoute extends _i5.PageRouteInfo<void> {
+class HomeRoute extends _i6.PageRouteInfo<void> {
   const HomeRoute()
       : super(
           HomeRoute.name,
@@ -136,9 +150,9 @@ class HomeRoute extends _i5.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i3.DashboardScreen]
-class DashboardRoute extends _i5.PageRouteInfo<DashboardRouteArgs> {
+class DashboardRoute extends _i6.PageRouteInfo<DashboardRouteArgs> {
   DashboardRoute({
-    _i6.Key? key,
+    _i7.Key? key,
     String? title,
   }) : super(
           DashboardRoute.name,
@@ -158,7 +172,7 @@ class DashboardRouteArgs {
     this.title,
   });
 
-  final _i6.Key? key;
+  final _i7.Key? key;
 
   final String? title;
 
@@ -169,8 +183,32 @@ class DashboardRouteArgs {
 }
 
 /// generated route for
-/// [_i4.AboutScreen]
-class AboutRoute extends _i5.PageRouteInfo<void> {
+/// [_i4.MyQRScreen]
+class MyQRScreenRoute extends _i6.PageRouteInfo<MyQRScreenRouteArgs> {
+  MyQRScreenRoute({_i7.Key? key})
+      : super(
+          MyQRScreenRoute.name,
+          path: '/myqr',
+          args: MyQRScreenRouteArgs(key: key),
+        );
+
+  static const String name = 'MyQRScreenRoute';
+}
+
+class MyQRScreenRouteArgs {
+  const MyQRScreenRouteArgs({this.key});
+
+  final _i7.Key? key;
+
+  @override
+  String toString() {
+    return 'MyQRScreenRouteArgs{key: $key}';
+  }
+}
+
+/// generated route for
+/// [_i5.AboutScreen]
+class AboutRoute extends _i6.PageRouteInfo<void> {
   const AboutRoute()
       : super(
           AboutRoute.name,

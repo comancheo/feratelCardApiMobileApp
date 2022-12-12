@@ -1,3 +1,4 @@
+import 'package:example/util/communication.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import '/routes/router.gr.dart';
@@ -43,6 +44,33 @@ Drawer DrawerPart(context) {
             ListTile(
               title: const Text('Přihlášení'),
               onTap: () {
+                AutoRouter.of(context).push(
+                    LoginRoute(
+                      onLoginCallback: (_) {
+                        AutoRouter.of(context).push(DashboardRoute());
+                      },
+                    )
+                );
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('QR pro přihlášení'),
+              onTap: () {
+                AutoRouter.of(context).push(
+                    MyQRScreenRoute()
+                );
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Odhlásit se'),
+              onTap: () {
+                if (Communication().amILoggedIn()) {
+                  Communication().logout((_){
+                    //TODO what to do after logout
+                  });
+                }
                 AutoRouter.of(context).push(
                     LoginRoute(
                       onLoginCallback: (_) {

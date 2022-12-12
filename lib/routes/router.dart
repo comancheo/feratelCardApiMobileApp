@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:example/screens/myqr/myqr.dart';
 import '/routes/route_guard.dart';
 import '/screens/about/about_screen.dart';
 import '/screens/dashboard/dashboard_screen.dart';
@@ -17,6 +18,12 @@ import '/screens/login/login_screen.dart';
       page: DashboardScreen,
       name: 'DashboardRoute',
       path: '/dashboard',
+      guards: [RouteGuard],
+    ),
+    AutoRoute(
+      page: MyQRScreen,
+      name: 'MyQRScreenRoute',
+      path: '/myqr',
       guards: [RouteGuard],
     ),
     AutoRoute(page: AboutScreen, name: 'AboutRoute', path: '/about')

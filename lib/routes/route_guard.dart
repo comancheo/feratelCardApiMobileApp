@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import '/routes/router.gr.dart';
-import '/screens/login/login_screen.dart';
 import '/util/auth_service.dart';
 
 class RouteGuard extends AutoRedirectGuard {

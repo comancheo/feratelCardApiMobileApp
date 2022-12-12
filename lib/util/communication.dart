@@ -1,3 +1,4 @@
+import '/main.dart';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +8,6 @@ import 'package:flutter/material.dart';
 
 
 class Communication {
-
   static final Communication _communication = Communication._internal();
   final LocalStorage storage = new LocalStorage('feratelAppLogin');
   @override
@@ -17,6 +17,29 @@ class Communication {
   }
   Communication._internal();
   bool loggedIn = false;
+
+  bool tryRelogin(Function callable){
+    if (this.storage.getItem("login")==null) {
+      this.logIn(this.storage.getItem("login"),callable);
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  logout (Function callable) {
+    Future<dynamic> response = this.callServer('logout/',{});
+    this.storage.setItem("login",null);
+    this.storage.setItem("checkpoint",null);
+    this.storage.setItem("secToken",null);
+    this.loggedIn = false;
+    MyApp.of(applicationKey.currentContext!).authService.authenticated = Communication().amILoggedIn();
+    return response.then((r){
+      if (r['logout']=="OK") {}
+      callable.call(this.amILoggedIn());
+      return this.amILoggedIn();
+    });
+  }
 
   logIn(dynamic login, Function callable) {
     Future<dynamic> response = this.callServer('login/',login);
@@ -34,10 +57,8 @@ class Communication {
     });
   }
 
-
-
   bool amILoggedIn() {
-    if (this.loggedIn) {
+    if (this.loggedIn || (this.storage.getItem("login")!=null && this.storage.getItem("secToken") != null)) {
       return true;
     } else {
       return false;
@@ -66,7 +87,22 @@ class Communication {
       callback.call(result);
     });
   }
-
+  String getLoginQRData(){
+    if (this.amILoggedIn()) {
+      String base64Login = base64.encode(utf8.encode(jsonEncode(this.storage.getItem("login"))));
+      //print(base64Login);
+      //print(jsonDecode(utf8.decode(base64.decode(base64Login))));
+      return (base64Login);
+    }
+    return "";
+  }
+  dynamic getLoginFromQRData(String base64Login){
+    try{
+      return jsonDecode(utf8.decode(base64.decode(base64Login)));
+    } catch (e) {
+      return false;
+    }
+  }
   dynamic callServer(String url, dynamic parameters) async {
     try {
       final response = await http.post(
@@ -78,7 +114,6 @@ class Communication {
         encoding: Encoding.getByName("utf-8"),
       );
       dynamic data = jsonDecode(response.body);
-      print(this.applicationKey.currentContext);
       if (data['status'] == 'OK') {
         return data;
       }

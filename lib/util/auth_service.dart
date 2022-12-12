@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '/util/communication.dart';
 
 class AuthService extends ChangeNotifier {
-  bool _authenticated = Communication().amILoggedIn();
+  bool _authenticated = false;
 
   bool get authenticated => _authenticated;
 

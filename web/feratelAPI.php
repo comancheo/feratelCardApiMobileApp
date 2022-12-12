@@ -8,7 +8,7 @@ class feratelAPI
     const GRANT_TYPE = "password";
     const API_TENANT = "itest";
     const API_URL = "https://card-check-api.feratel.com:443/v1/".self::API_TENANT."/secure/checkpoints/";
-    const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints'];
+    const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints', 'handleLogout'];
 
     private $json = [];
     public function __construct(){
@@ -38,7 +38,16 @@ class feratelAPI
             ]);
         }
     }
-
+    public function handleLogout($request){
+        $this->logout();
+        return $this->setResponse('OK', [
+            'logout'=>'OK'
+        ]);
+    }
+    private function logout(){
+        $this->setSession("login","");
+        $this->setSession("token","");
+    }
     public function handleCheckcard($request){
         $params = [
             'checkPointId'=>$this->getJson('checkPointId'),
@@ -140,7 +149,11 @@ class feratelAPI
         }
         return [];
     }
-
+    private function checkLogin(){
+        if ($this->getSession('login')==""){
+            //TODO force re-login
+        }
+    }
     private function isTokenValid(){
         $now = time();
         if (is_array($this->getSession('token')) && $this->getSession('token')['not-before-policy'] > $now) {

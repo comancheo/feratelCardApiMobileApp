@@ -18,8 +18,10 @@ class _LoginScreen extends State<LoginScreen> {
   Function(bool loggedIn)? onLoginCallback;
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController qrloginController = TextEditingController();
   String loginProgress = 'showForm';
   String error = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +68,15 @@ class _LoginScreen extends State<LoginScreen> {
                   label: "Heslo",
                   controller:this.passwordController,
                   hint:"Vložte heslo",
+                  obscureText: true,
+                  onSubmit: (_) {
+                    this.handleSubmitLogin();
+                  }
+              ).getWidget(),
+              inputTextField(
+                  label: "QRLogin",
+                  controller:this.qrloginController,
+                  hint:"Vložte text načtený z vašeho QR loginu",
                   obscureText: true,
                   onSubmit: (_) {
                     this.handleSubmitLogin();
@@ -118,14 +129,22 @@ class _LoginScreen extends State<LoginScreen> {
     }
     return members;
   }
+
   handleSubmitLogin(){
-    if (this.usernameController.text == "" || this.passwordController.text == "") {
+    if ((this.usernameController.text == "" || this.passwordController.text == "") && this.qrloginController=="") {
       return;
     }
     setState(() {
       this.loginProgress = "loading";
     });
     dynamic data = {"login":{"username":this.usernameController.text, "password":this.passwordController.text}};
+    if (this.qrloginController.text != "") {
+      dynamic tryUnbase = Communication().getLoginFromQRData(this.qrloginController.text);
+      if (tryUnbase != false) {
+        this.qrloginController.text = "";
+        data = tryUnbase;
+      }
+    }
     Communication().logIn(data,(result){
       var error = "";
       if (Communication().amILoggedIn()) {
