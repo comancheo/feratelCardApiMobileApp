@@ -29,7 +29,6 @@ dependencies:
   cupertino_icons: ^1.0.0
   jsqr: ^0.1.4
   qr_code_scanner: ^0.4.0
-  oauth2_client: ^2.3.1
   http: ^0.13.5
   localstorage: ^4.0.0+1
   convert: ^3.1.1

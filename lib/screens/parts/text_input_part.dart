@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 class inputTextField{
-  inputTextField({this.onSubmit, this.controller, this.obscureText, required this.label, this.hint, this.autofocus})
-      : assert(onSubmit != null), assert(controller != null), assert(obscureText != null), assert(hint != null), assert(autofocus != null);
-
+  inputTextField({this.onSubmit, this.controller, this.obscureText, required this.label, this.hint, this.autofocus});
   Function? onSubmit = (_){};
   TextEditingController? controller;
   bool? obscureText = false;
