@@ -39434,7 +39434,7 @@ return new A.Og(this.c,new A.oq(B.cB,s),new A.oq(B.cB,s),new A.oq(B.cB,s),B.k)}}
 A.Og.prototype={
 J(a){var s=null,r=A.DF(A.d8("Akceptace karty: P\u0159ihl\xe1\u0161en\xed",s,s,s,s,s,s)),q=A.G1(a)
 return A.JY(r,B.j,A.az1(A.l9(this.Qn(),B.aR,B.dc,B.aW)),q,s)},
-aaQ(){var s=this,r=null,q=A.hC(A.dZ(r,new A.w3(A.ayH(r,r,new A.us("assets/images/snezka.png",r,r)),r),r,r,r,150,r,r,200),r,r),p=new A.u_(new A.adI(s),s.e,!1,r,"Jm\xe9no","Vlo\u017ete jm\xe9no").jE(),o=new A.u_(new A.adJ(s),s.f,!0,r,"Heslo","Vlo\u017ete heslo").jE(),n=new A.u_(new A.adK(s),s.r,!0,r,"QRLogin","Vlo\u017ete text na\u010dten\xfd z va\u0161eho QR loginu").jE(),m=A.hc(r,50,r),l=A.E5(20)
+aaQ(){var s=this,r=null,q=A.hC(A.dZ(r,new A.w3(A.ayH(r,r,new A.us("assets/images/svazek-logo.png",r,r)),r),r,r,r,150,r,r,200),r,r),p=new A.u_(new A.adI(s),s.e,!1,r,"Jm\xe9no","Vlo\u017ete jm\xe9no").jE(),o=new A.u_(new A.adJ(s),s.f,!0,r,"Heslo","Vlo\u017ete heslo").jE(),n=new A.u_(new A.adK(s),s.r,!0,r,"QRLogin","Vlo\u017ete text na\u010dten\xfd z va\u0161eho QR loginu").jE(),m=A.hc(r,50,r),l=A.E5(20)
 l=A.l9(A.a([new A.dK(B.Bi,q,r),p,o,n,m,A.dZ(r,new A.wQ(new A.adL(s),A.d8("Login",r,r,r,A.fB(r,r,B.j,r,r,r,r,r,r,r,r,25,r,r,r,r,r,!0,r,r,r,r,r,r,r,r),r,r),r),r,r,new A.eO(B.ev,r,r,l,r,r,B.bv),50,r,r,250),A.hc(r,130,r)],t.D),B.aR,B.bX,B.aW)
 return new A.vU(l,B.wI,r)},
 Qn(){var s,r=this,q=A.a([],t.D),p=$.hu()
