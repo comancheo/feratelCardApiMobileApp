@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:example/util/communication.dart';
 import '/routes/router.gr.dart';
 import '/util/auth_service.dart';
 
@@ -6,6 +7,7 @@ class RouteGuard extends AutoRedirectGuard {
   final AuthService authService;
 
   RouteGuard(this.authService) {
+    authService.authenticated = Communication().amILoggedIn();
     authService.addListener(() {
       if (!authService.authenticated) {
         // should be called when the logic effecting this guard changes

@@ -117,6 +117,21 @@ class _LoginScreen extends State<LoginScreen> {
   }
   List<Widget> showBody(){
     List<Widget> members = [];
+    if (!Communication().isStorageReady) {
+      members.add(loadingCircle());
+      Communication().storage.ready.then((_){
+        Communication().isStorageReady = true;
+        setState(() {
+          this.loginProgress == "showForm";
+          MyApp.of(context).authService.authenticated = Communication().amILoggedIn();
+          onLoginCallback?.call(MyApp.of(context).authService.authenticated);
+          if (onLoginCallback == null) {
+            AutoRouter.of(context).push(DashboardRoute());
+          }
+        });
+      });
+      return members;
+    }
     if (this.error != "") {
       members.add(this.errorText(this.error));
       this.error = "";

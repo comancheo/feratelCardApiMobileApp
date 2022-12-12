@@ -17,7 +17,7 @@ class Communication {
   }
   Communication._internal();
   bool loggedIn = false;
-
+  bool isStorageReady = false;
   bool tryRelogin(Function callable){
     if (this.storage.getItem("login")==null) {
       this.logIn(this.storage.getItem("login"),callable);
@@ -90,8 +90,6 @@ class Communication {
   String getLoginQRData(){
     if (this.amILoggedIn()) {
       String base64Login = base64.encode(utf8.encode(jsonEncode(this.storage.getItem("login"))));
-      //print(base64Login);
-      //print(jsonDecode(utf8.decode(base64.decode(base64Login))));
       return (base64Login);
     }
     return "";
