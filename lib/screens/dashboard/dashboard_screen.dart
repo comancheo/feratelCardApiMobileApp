@@ -31,7 +31,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     AlertWindow alert = this.alertWindow??AlertWindow(context: context);
-    return Scaffold(
+    return LoadingBeforePart(body:Scaffold(
       appBar: AppBar(
         title: Text("Akceptace karty: Akceptuj kartu"),
       ),
@@ -78,7 +78,7 @@ class _DashboardScreen extends State<DashboardScreen> {
         tooltip: 'Skenuj QR',
         child: Icon(Icons.qr_code),
       ),
-    );
+    ));
   }
 
   void _openScan() async {

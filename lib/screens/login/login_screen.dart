@@ -1,5 +1,5 @@
-import 'package:example/util/communication.dart';
 import 'package:flutter/material.dart';
+import '/util/communication.dart';
 import '/main.dart';
 import '/screens/parts/parts.dart';
 import 'package:auto_route/auto_route.dart';
@@ -24,7 +24,7 @@ class _LoginScreen extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return LoadingBeforePart(body:Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text("Akceptace karty: Přihlášení"),
@@ -36,7 +36,7 @@ class _LoginScreen extends State<LoginScreen> {
             children:showBody()
         ),
       ),
-    );
+    ));
   }
 
   Form loginForm(){
@@ -117,20 +117,15 @@ class _LoginScreen extends State<LoginScreen> {
   }
   List<Widget> showBody(){
     List<Widget> members = [];
-    if (!Communication().isStorageReady) {
-      members.add(loadingCircle());
-      Communication().storage.ready.then((_){
-        Communication().isStorageReady = true;
-        setState(() {
-          this.loginProgress == "showForm";
-          MyApp.of(context).authService.authenticated = Communication().amILoggedIn();
-          onLoginCallback?.call(MyApp.of(context).authService.authenticated);
-          if (onLoginCallback == null) {
-            AutoRouter.of(context).push(DashboardRoute());
-          }
-        });
+    if (Communication().amILoggedIn()) {
+      setState(() {
+        this.loginProgress == "showForm";
+        MyApp.of(context).authService.authenticated = Communication().amILoggedIn();
+        onLoginCallback?.call(MyApp.of(context).authService.authenticated);
+        if (onLoginCallback == null) {
+          AutoRouter.of(context).push(DashboardRoute());
+        }
       });
-      return members;
     }
     if (this.error != "") {
       members.add(this.errorText(this.error));

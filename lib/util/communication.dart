@@ -18,10 +18,19 @@ class Communication {
   Communication._internal();
   bool loggedIn = false;
   bool isStorageReady = false;
+
+  handleOnstartLoading(Function callable){
+      this.storage.ready.then((_){
+        this.isStorageReady = true;
+        this.tryRelogin(callable);
+      });
+  }
+
   bool tryRelogin(Function callable){
-    if (this.storage.getItem("login")==null) {
+    if (this.amILoggedIn()) {
       this.logIn(this.storage.getItem("login"),callable);
     } else {
+      callable.call(this.amILoggedIn());
       return false;
     }
     return true;
@@ -49,10 +58,11 @@ class Communication {
         this.storage.setItem("checkpoint", r['checkpoint']);
         this.storage.setItem("secToken", r['secToken']);
         this.loggedIn = true;
+        callable.call(this.amILoggedIn());
       } else {
         this.loggedIn = false;
+        this.logout(callable);
       };
-      callable.call(this.amILoggedIn());
       return this.amILoggedIn();
     });
   }

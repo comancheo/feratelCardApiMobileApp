@@ -8,7 +8,7 @@ class MyQRScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return LoadingBeforePart(body:Scaffold(
       appBar: AppBar(
         title: Text("Akceptace karty: Přihlašovací QR"),
       ),
@@ -32,6 +32,6 @@ class MyQRScreen extends StatelessWidget {
           ],
         ),
       )
-    );
+    ));
   }
 }

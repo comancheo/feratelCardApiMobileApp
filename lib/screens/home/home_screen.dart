@@ -8,7 +8,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return LoadingBeforePart(body:Scaffold(
       appBar: AppBar(
         title: Text("Akceptace karty"),
       ),
@@ -48,6 +48,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }

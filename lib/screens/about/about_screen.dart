@@ -6,7 +6,7 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return LoadingBeforePart(body:Scaffold(
       appBar: AppBar(
         title: Text("Akceptace karty: O Aplikaci"),
       ),
@@ -19,6 +19,6 @@ class AboutScreen extends StatelessWidget {
           ),
         ),
       )
-    );
+    ));
   }
 }
