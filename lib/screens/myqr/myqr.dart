@@ -4,34 +4,42 @@ import '/util/communication.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class MyQRScreen extends StatelessWidget {
-  const MyQRScreen({Key? key}) : super(key: key);
+  MyQRScreen({Key? key}) : super(key: key);
+  final Future<bool> startLoading = Communication().handleOnstartLoading();
 
   @override
   Widget build(BuildContext context) {
-    return LoadingBeforePart(body:Scaffold(
-      appBar: AppBar(
-        title: Text("Akceptace karty: Přihlašovací QR"),
-      ),
-      drawer: DrawerPart(context),
-      body: Center(
-        child: Column(
-          children: [
-            SizedBox(height:50),
-            Text(
-              'Toto QR můžete použít pro rychlé přihlášení',
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
-            SizedBox(height:50),
-            QrImage(
-              data: Communication().getLoginQRData(),
-              version: QrVersions.auto,
-              size: 200.0,
-            ),
-          ],
-        ),
-      )
-    ));
+    return FutureBuilder<bool>(
+        future: startLoading,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text("Akceptace karty: Přihlašovací QR"),
+                ),
+                drawer: DrawerPart(context),
+                body: Center(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 50),
+                      Text(
+                        'Toto QR můžete použít pro rychlé přihlášení',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(height: 50),
+                      QrImage(
+                        data: Communication().getLoginQRData(),
+                        version: QrVersions.auto,
+                        size: 200.0,
+                      ),
+                    ],
+                  ),
+                ));
+          } else {
+            return loadingCircle();
+          }
+        });
   }
 }

@@ -34,7 +34,8 @@ class AlertWindow {
                           ],
                   ),
                   SizedBox(width: 30,),
-                  Text(this.title??"",
+                  Flexible(child:Text(this.title??"",
+                        overflow: TextOverflow.clip,
                         style: TextStyle(color: Colors.white, fontSize: 30,
                           shadows: <Shadow>[
                             Shadow(
@@ -44,7 +45,7 @@ class AlertWindow {
                             ),
                           ],
                         )
-                  )
+                  )),
                 ]
               ),
               content: Container(

@@ -43,9 +43,11 @@ class AppRouter extends _i6.RootStackRouter {
       );
     },
     HomeRoute.name: (routeData) {
+      final args =
+          routeData.argsAs<HomeRouteArgs>(orElse: () => const HomeRouteArgs());
       return _i6.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i2.HomeScreen(),
+        child: _i2.HomeScreen(key: args.key),
       );
     },
     DashboardRoute.name: (routeData) {
@@ -68,9 +70,11 @@ class AppRouter extends _i6.RootStackRouter {
       );
     },
     AboutRoute.name: (routeData) {
+      final args = routeData.argsAs<AboutRouteArgs>(
+          orElse: () => const AboutRouteArgs());
       return _i6.MaterialPageX<dynamic>(
         routeData: routeData,
-        child: const _i5.AboutScreen(),
+        child: _i5.AboutScreen(key: args.key),
       );
     },
   };
@@ -138,14 +142,26 @@ class LoginRouteArgs {
 
 /// generated route for
 /// [_i2.HomeScreen]
-class HomeRoute extends _i6.PageRouteInfo<void> {
-  const HomeRoute()
+class HomeRoute extends _i6.PageRouteInfo<HomeRouteArgs> {
+  HomeRoute({_i7.Key? key})
       : super(
           HomeRoute.name,
           path: '/',
+          args: HomeRouteArgs(key: key),
         );
 
   static const String name = 'HomeRoute';
+}
+
+class HomeRouteArgs {
+  const HomeRouteArgs({this.key});
+
+  final _i7.Key? key;
+
+  @override
+  String toString() {
+    return 'HomeRouteArgs{key: $key}';
+  }
 }
 
 /// generated route for
@@ -208,12 +224,24 @@ class MyQRScreenRouteArgs {
 
 /// generated route for
 /// [_i5.AboutScreen]
-class AboutRoute extends _i6.PageRouteInfo<void> {
-  const AboutRoute()
+class AboutRoute extends _i6.PageRouteInfo<AboutRouteArgs> {
+  AboutRoute({_i7.Key? key})
       : super(
           AboutRoute.name,
           path: '/about',
+          args: AboutRouteArgs(key: key),
         );
 
   static const String name = 'AboutRoute';
+}
+
+class AboutRouteArgs {
+  const AboutRouteArgs({this.key});
+
+  final _i7.Key? key;
+
+  @override
+  String toString() {
+    return 'AboutRouteArgs{key: $key}';
+  }
 }

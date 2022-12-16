@@ -17,7 +17,7 @@ Drawer DrawerPart(context) {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                AutoRouter.of(context).push(const HomeRoute());
+                AutoRouter.of(context).push(HomeRoute());
                 Navigator.pop(context);
               },
             ),
@@ -27,7 +27,7 @@ Drawer DrawerPart(context) {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                AutoRouter.of(context).push(const AboutRoute());
+                AutoRouter.of(context).push(AboutRoute());
                 Navigator.pop(context);
               },
             ),
@@ -41,7 +41,7 @@ Drawer DrawerPart(context) {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
+            if (!Communication().amILoggedIn()) ListTile(
               title: const Text('Přihlášení'),
               onTap: () {
                 AutoRouter.of(context).push(
@@ -54,7 +54,7 @@ Drawer DrawerPart(context) {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
+            if (Communication().amILoggedIn()) ListTile(
               title: const Text('QR pro přihlášení'),
               onTap: () {
                 AutoRouter.of(context).push(
@@ -63,7 +63,7 @@ Drawer DrawerPart(context) {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
+            if (Communication().amILoggedIn()) ListTile(
               title: const Text('Odhlásit se'),
               onTap: () {
                 if (Communication().amILoggedIn()) {

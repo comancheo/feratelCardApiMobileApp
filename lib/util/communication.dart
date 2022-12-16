@@ -19,11 +19,12 @@ class Communication {
   bool loggedIn = false;
   bool isStorageReady = false;
 
-  handleOnstartLoading(Function callable){
-      this.storage.ready.then((_){
-        this.isStorageReady = true;
-        this.tryRelogin(callable);
+  Future<bool> handleOnstartLoading(){
+    return this.storage.ready.then((_){
+      return this.tryRelogin((_){
+        MyApp.of(applicationKey.currentContext!).authService.authenticated = Communication().amILoggedIn();
       });
+    });
   }
 
   bool tryRelogin(Function callable){
@@ -114,7 +115,7 @@ class Communication {
   dynamic callServer(String url, dynamic parameters) async {
     try {
       final response = await http.post(
-        Uri.parse('/feratelAPI.php/'+url),
+        Uri.parse('http://localhost:8000/feratelAPI.php/'+url),
         headers: <String, String>{
           'Content-Type':'application/json; charset=UTF-8',
         },

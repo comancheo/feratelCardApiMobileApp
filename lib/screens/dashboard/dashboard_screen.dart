@@ -16,6 +16,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   String? code;
   AlertWindow? alertWindow;
   Future<bool>? camAvailableF;
+  final Future<bool> startLoading = Communication().handleOnstartLoading();
 
   @override
   void initState() {
@@ -31,45 +32,28 @@ class _DashboardScreen extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     AlertWindow alert = this.alertWindow??AlertWindow(context: context);
-    return LoadingBeforePart(body:Scaffold(
+    return FutureBuilder<bool>(
+        future: startLoading,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return this.body(context);
+          } else {
+            return loadingCircle();
+          }
+        }
+        );
+  }
+  Widget body(BuildContext context){
+    return Scaffold(
       appBar: AppBar(
-        title: Text("Akceptace karty: Akceptuj kartu"),
+        title: Text("Akceptace karty: Akceptuj kartu",overflow: TextOverflow.clip,),
       ),
       drawer: DrawerPart(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FutureBuilder<bool>(
-              future: camAvailableF,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Text("Chyba: ${snapshot.error}");
-                }
-                if (snapshot.hasData) {
-                  if (snapshot.data??false) {
-                    return (Text("Můžete naskenovat kód kamerou"));
-                  }
-                  return (Text("Verze bez kamery"));
-                } else {
-                  return CircularProgressIndicator();
-                }
-              },
-            ),
             ...this.showBody(),
-            alert.getWidget(),
-            inputTextField(
-                label: "Číslo karty",
-                hint: "Vložte číslo karty nebo ho naskenujte",
-                autofocus: true,
-                controller: this.inputCodeController,
-                onSubmit: (_){
-                  setState(() {
-                    this.code = this.inputCodeController.text;
-                    this.handleSubmitCode();
-                  });
-                }
-            ).getWidget(),
           ],
         ),
       ),
@@ -78,7 +62,7 @@ class _DashboardScreen extends State<DashboardScreen> {
         tooltip: 'Skenuj QR',
         child: Icon(Icons.qr_code),
       ),
-    ));
+    );
   }
 
   void _openScan() async {
@@ -110,10 +94,48 @@ class _DashboardScreen extends State<DashboardScreen> {
     List<Widget> members = [];
     if (this.loading) {
       members.add(loadingCircle());
+    } else {
+      members.add(
+            FutureBuilder<bool>(
+              future: camAvailableF,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text("Chyba: ${snapshot.error}");
+                }
+                if (snapshot.hasData) {
+                  if (snapshot.data??false) {
+                    return (Text("Můžete naskenovat kód kamerou"));
+                  }
+                  return (Text("Verze bez kamery"));
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            ));
+      if(this.alertWindow!=null){
+        members.add(this.alertWindow!.getWidget());
+      }
+      members.add(
+            inputTextField(
+                label: "Číslo karty",
+                hint: "Vložte číslo karty nebo ho naskenujte",
+                autofocus: true,
+                controller: this.inputCodeController,
+                onSubmit: (_){
+                  setState(() {
+                    this.code = this.inputCodeController.text;
+                    this.handleSubmitCode();
+                  });
+                }
+            ).getWidget());
     }
     return members;
   }
   bool isCardValid() {
+    setState(() {
+      this.codeHandled = true;
+      this.loading = true;
+    });
     return Communication().checkCardValidity(this.code??"", (result){
       AlertWindow alert = AlertWindow(context: context);
         if (result) {
@@ -147,10 +169,6 @@ class _DashboardScreen extends State<DashboardScreen> {
     if (this.code == "") {
       return;
     }
-    setState(() {
-      this.codeHandled = true;
-      this.loading = true;
-    });
     bool isValid = await this.isCardValid();
   }
 }
