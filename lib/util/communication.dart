@@ -91,11 +91,7 @@ class Communication {
     };
     final response = this.callServer("checkcard/",data);
     response.then((r){
-      var result = false;
-      if (r['card']=='OK') {
-        result = true;
-      }
-      callback.call(result);
+      callback.call(r);
     });
   }
   String getLoginQRData(){

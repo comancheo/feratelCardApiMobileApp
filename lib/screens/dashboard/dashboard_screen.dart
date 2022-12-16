@@ -138,11 +138,23 @@ class _DashboardScreen extends State<DashboardScreen> {
     });
     return Communication().checkCardValidity(this.code??"", (result){
       AlertWindow alert = AlertWindow(context: context);
-        if (result) {
+        if (result['card'] == "OK") {
+          String message = "";
+          print(result['service']);
+          for (var service in result['service']){
+            print(service["type"]["translations"]);
+            for(var translation in service["type"]["translations"]){
+              String tmpMessage;
+              if (translation['language'] == 'cs') {
+                tmpMessage = translation['name']+"\n";
+                message = message + tmpMessage;
+              }
+            }
+          }
           alert = AlertWindow(
             context: context,
             show: true,
-            message: "Karta je validní",
+            message: "Karta je validní\n"+message,
             color: Colors.green,
             title: "Karta je validní",
             icon: Icons.check

@@ -5,8 +5,8 @@ class feratelAPI
     const TOKEN_URL = "https://idp.feratel.com/auth/realms/card-api/protocol/openid-connect/token";
     const CLIENT_ID = "985c74b7";
     const CLIENT_SECRET = "e569715e5484235b8638a29ebec5a213";
-    const GRANT_TYPE = "password";
     const API_TENANT = "itest";
+    const GRANT_TYPE = "password";
     const API_URL = "https://card-check-api.feratel.com:443/v1/".self::API_TENANT."/secure/checkpoints/";
     const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints', 'handleLogout'];
 
@@ -107,6 +107,8 @@ class feratelAPI
         return $this->setResponse('OK', [
             'card'=>'OK',
             'cardValidTo' => $to,
+            'service' => $data['checkPoint']['serviceTypeAssignments'],
+            'data' => $data
         ]);
     }
     public function handleCheckpoints(){
