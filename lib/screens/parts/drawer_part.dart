@@ -63,6 +63,15 @@ Drawer DrawerPart(context) {
                 Navigator.pop(context);
               },
             ),
+            if (Communication().storage.getItem("role")=="admin") ListTile(
+              title: const Text('Uživatelé'),
+              onTap: () {
+                AutoRouter.of(context).push(
+                    UsersRoute()
+                );
+                Navigator.pop(context);
+              },
+            ),
             if (Communication().amILoggedIn()) ListTile(
               title: const Text('Odhlásit se'),
               onTap: () {

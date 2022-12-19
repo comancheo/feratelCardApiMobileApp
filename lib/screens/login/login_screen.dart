@@ -180,6 +180,7 @@ class _LoginScreen extends State<LoginScreen> {
     Future.delayed(Duration.zero, () {
       setState(() {
         MyApp.of(context).authService.authenticated = Communication().amILoggedIn();
+        MyApp.of(context).authService.isAdmin = (Communication().storage.getItem("role")=="admin");
         onLoginCallback?.call(MyApp.of(context).authService.authenticated);
         if (onLoginCallback == null) {
           AutoRouter.of(context).push(DashboardRoute());

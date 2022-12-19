@@ -2,11 +2,11 @@
 session_start();
 class config {
     /*DB Configuration*/
-    static private $db_driver = ""; //PDO driver
-    static private $db_user = ""; //DB USER
-    static private $db_password = ""; //DB PASS
-    static private $db_name = ""; //DB NAME
-    static private $db_server = ""; //DB SERVER
+    static private $db_driver = "mysql"; //PDO driver
+    static private $db_user = "a104545_belun"; //DB USER
+    static private $db_password = "d4XkDkGn"; //DB PASS
+    static private $db_name = "d104545_belun"; //DB NAME
+    static private $db_server = "wm91.wedos.net"; //DB SERVER
 
     public static function db_driver(){
         return self::$db_driver;
@@ -42,9 +42,11 @@ class feratelAPI
     const API_URL = "https://card-check-api.feratel.com:443/v1/".self::API_TENANT."/secure/checkpoints/";
     const API_USERNAME = "api_comancheo";
     const API_PASSWORD = "Phphtml213";
-    const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints', 'handleLogout'];
+    const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints', 'handleLogout','handleUsers'];
 
     private $json = [];
+
+    private $user = [];
 
     private $db;
     public function __construct(){
@@ -107,8 +109,17 @@ class feratelAPI
             'login'=>'OK',
             'checkpoint' => $user['checkpoint'],
             'checkpointName' => $this->getCheckpointById($user['checkpoint'])['name'],
+            'role' => $user['role'],
             'sectoken'=>$user['sectoken']
         ]);
+    }
+    public function handleUsers($request){
+        $users = $this->getUsers();
+        foreach ($users as &$user){
+            unset($user['password']);
+            $user['checkpointName'] = $this->getCheckpointById($user['checkpoint'])['name'];
+        }
+        return $this->setResponse("OK",["users"=>$users]);
     }
     public function handleLogout($request){
         $this->logout();
@@ -147,7 +158,10 @@ class feratelAPI
         ]);
     }
     public function handleCheckpoints(){
-        return $this->getFirstCheckpoint()['id'];
+        if (!$this->getCheckpoints()) {
+            return $this->setResponse("OK", ["checkpoints"=>"ERROR"]);
+        }
+        return $this->setResponse("OK", ["checkpoints"=>$this->getCheckpoints()]);
     }
     private function getCheckpointById($id){
         $checkpoints = $this->getCheckpoints();
@@ -306,9 +320,9 @@ class feratelAPI
     private function getUsers(){
         static $users;
         if (!$users) {
-            $us = $this->db->prepare("SELECT * FROM users");
+            $us = $this->db->prepare("SELECT * FROM svazek_users");
             $us->execute();
-            $users = $us->fetchAll();
+            $users = $us->fetchAll(PDO::FETCH_ASSOC);
         }
         return $users;
     }
@@ -325,6 +339,7 @@ class feratelAPI
         foreach($user as $u){
             if (password_verify($login['password'], $u['password'])) {
                 unset($u['password']);
+                $this->user = $u;
                 return $u;
             }
         }
@@ -336,6 +351,7 @@ class feratelAPI
         $user->execute(['sectoken'=>$sectoken]);
         $user = $user->fetchAll(PDO::FETCH_ASSOC);
         foreach($user as $u){
+            $this->user = $u;
             return $u;
         }
         return false;

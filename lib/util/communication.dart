@@ -16,6 +16,7 @@ class Communication {
     return _communication;
   }
   Communication._internal();
+  Map<String, String> Checkpoints = {};
   bool loggedIn = false;
   bool isStorageReady = false;
 
@@ -23,6 +24,11 @@ class Communication {
     return this.storage.ready.then((_){
       return this.tryRelogin((_){
         MyApp.of(applicationKey.currentContext!).authService.authenticated = Communication().amILoggedIn();
+        MyApp.of(applicationKey.currentContext!).authService.isAdmin = (Communication().storage.getItem("role")=="admin");
+        if (Communication().amILoggedIn()) {
+          return this.loadCheckpoints();
+        }
+        return this.amILoggedIn();
       });
     });
   }
@@ -31,8 +37,7 @@ class Communication {
     if (this.amILoggedIn()) {
       this.logIn(this.storage.getItem("login"),callable);
     } else {
-      callable.call(this.amILoggedIn());
-      return false;
+      return callable.call(this.amILoggedIn());
     }
     return true;
   }
@@ -41,13 +46,26 @@ class Communication {
     Future<dynamic> response = this.callServer('logout/',{});
     this.storage.setItem("login",null);
     this.storage.setItem("checkpoint",null);
+    this.storage.setItem("checkpointName",null);
     this.storage.setItem("sectoken",null);
+    this.storage.setItem("role",null);
     this.loggedIn = false;
     MyApp.of(applicationKey.currentContext!).authService.authenticated = Communication().amILoggedIn();
+    MyApp.of(applicationKey.currentContext!).authService.isAdmin = (Communication().storage.getItem("role")=="admin");
     return response.then((r){
       if (r['logout']=="OK") {}
       callable.call(this.amILoggedIn());
       return this.amILoggedIn();
+    });
+  }
+
+  loadCheckpoints(){
+    Future<dynamic> response = this.callServer('checkpoints/',{"sectoken":this.storage.getItem("sectoken")});
+    return response.then((r){
+      if (r['checkpoints']!="ERROR") {
+        this.storage.setItem("checkpoints", r['checkpoints']);
+        return this.amILoggedIn();
+      }
     });
   }
 
@@ -59,6 +77,7 @@ class Communication {
         this.storage.setItem("checkpoint", r['checkpoint']);
         this.storage.setItem("checkpointName", r['checkpointName']);
         this.storage.setItem("sectoken", r['sectoken']);
+        this.storage.setItem("role", r['role']);
         this.loggedIn = true;
         callable.call(this.amILoggedIn());
       } else {
@@ -104,6 +123,11 @@ class Communication {
     } catch (e) {
       return false;
     }
+  }
+  Future<dynamic> getUsers(){
+    return callServer("users", {
+      'sectoken': this.storage.getItem("sectoken")
+    });
   }
   dynamic callServer(String url, dynamic parameters) async {
     try {
