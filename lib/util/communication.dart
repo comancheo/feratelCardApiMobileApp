@@ -41,7 +41,7 @@ class Communication {
     Future<dynamic> response = this.callServer('logout/',{});
     this.storage.setItem("login",null);
     this.storage.setItem("checkpoint",null);
-    this.storage.setItem("secToken",null);
+    this.storage.setItem("sectoken",null);
     this.loggedIn = false;
     MyApp.of(applicationKey.currentContext!).authService.authenticated = Communication().amILoggedIn();
     return response.then((r){
@@ -57,7 +57,8 @@ class Communication {
       if (r['login']=='OK') {
         this.storage.setItem("login", login);
         this.storage.setItem("checkpoint", r['checkpoint']);
-        this.storage.setItem("secToken", r['secToken']);
+        this.storage.setItem("checkpointName", r['checkpointName']);
+        this.storage.setItem("sectoken", r['sectoken']);
         this.loggedIn = true;
         callable.call(this.amILoggedIn());
       } else {
@@ -67,26 +68,22 @@ class Communication {
       return this.amILoggedIn();
     });
   }
+  String getCheckpointName(){
+    return this.storage.getItem('checkpointName');
+  }
 
   bool amILoggedIn() {
-    if (this.loggedIn || (this.storage.getItem("login")!=null && this.storage.getItem("secToken") != null)) {
+    if (this.loggedIn || (this.storage.getItem("login")!=null && this.storage.getItem("sectoken") != null)) {
       return true;
     } else {
       return false;
     }
   }
 
-  bool checkLoginOnline(){
-    var response = this.callServer('checklogin/',[]);
-    if (response['login']=='OK') {
-      return true;
-    }
-    return false;
-  }
-
   checkCardValidity(String code, Function callback){
     dynamic data = {
       'checkPointId': this.storage.getItem("checkpoint"),
+      'sectoken': this.storage.getItem("sectoken"),
       'identifier':code
     };
     final response = this.callServer("checkcard/",data);
@@ -111,7 +108,7 @@ class Communication {
   dynamic callServer(String url, dynamic parameters) async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:8000/feratelAPI.php/'+url),
+        Uri.parse('https://svazekapi.tabor-belun.cz/feratelAPI.php/'+url),
         headers: <String, String>{
           'Content-Type':'application/json; charset=UTF-8',
         },

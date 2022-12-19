@@ -96,6 +96,12 @@ class _DashboardScreen extends State<DashboardScreen> {
       members.add(loadingCircle());
     } else {
       members.add(
+        Text(Communication().getCheckpointName(),style:TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
+      );
+      members.add(
+        SizedBox(height:20)
+      );
+      members.add(
             FutureBuilder<bool>(
               future: camAvailableF,
               builder: (context, snapshot) {
@@ -138,7 +144,7 @@ class _DashboardScreen extends State<DashboardScreen> {
     });
     return Communication().checkCardValidity(this.code??"", (result){
       AlertWindow alert = AlertWindow(context: context);
-        if (result['card'] == "OK") {
+        if (result['card'] == "OK" && result['data']['valid'] == true) {
           String message = "";
           print(result['service']);
           for (var service in result['service']){
