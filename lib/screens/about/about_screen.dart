@@ -1,14 +1,15 @@
+import 'dart:js';
+
 import 'package:example/util/communication.dart';
 import 'package:flutter/material.dart';
 import '/screens/parts/parts.dart';
 
 class AboutScreen extends StatelessWidget {
   AboutScreen({Key? key}) : super(key: key);
-  final Future<bool> startLoading = Communication().handleOnstartLoading();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-        future: startLoading,
+        future: Communication().handleOnstartLoading(context: context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(

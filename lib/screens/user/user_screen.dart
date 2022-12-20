@@ -20,14 +20,11 @@ class _UserScreen extends State<UserScreen> {
     "role":TextEditingController(),
     "checkpoint":TextEditingController(),
   };
-  final Future<bool> startLoading = Communication().handleOnstartLoading();
+  bool lock = false;
   String checkpointValue = "";
   String roleValue = "";
-  dynamic checkpoints = Communication().storage.getItem("checkpoints");
-  List<DropdownMenuItem<String>> checkpointsItems = [DropdownMenuItem<String>(
-                              value: "Akceptační místo",
-                              child: Text("Akceptační místo"),
-                            )];
+  Future<dynamic> futureCheckpoints = Communication().loadCheckpoints();
+  List<DropdownMenuItem<String>>? checkpointsItems;
   List<DropdownMenuItem<String>> roleItems = [DropdownMenuItem<String>(
                               value: "user",
                               child: Text("Uživatel"),
@@ -37,25 +34,17 @@ class _UserScreen extends State<UserScreen> {
                             )];
   @override
   void initState() {
-    this.checkpointValue = this.user["checkpoint"]??checkpoints[0]["id"];
+    this.checkpointValue = this.user["checkpoint"]??"";
     this.controllers["username"]!.text=this.user["username"];
     this.controllers["password"]!.text="";
     this.roleValue=this.user["role"];
     this.controllers["checkpoint"]!.text=this.user["checkpoint"];
-    for(var checkpoint in checkpoints){
-      this.checkpointsItems.add(
-        DropdownMenuItem<String>(
-          value: checkpoint["id"]!,
-          child: Flexible(child:Text(checkpoint["name"]!, style: TextStyle(), overflow: TextOverflow.clip,)),
-        ));
-    }
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    print(this.checkpointValue);
     return FutureBuilder<bool>(
-      future: startLoading,
+      future: Communication().handleOnstartLoading(context: context),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Scaffold(
@@ -74,6 +63,7 @@ class _UserScreen extends State<UserScreen> {
                           controller: this.controllers["username"],
                           label: "Jméno",
                           hint: "Jméno uživatele",
+                          enabled: (this.user["id"]==0 && (!this.lock)),
                           obscureText: false,
                           onSubmit: (_) {
                           }
@@ -83,6 +73,7 @@ class _UserScreen extends State<UserScreen> {
                           label: "Heslo",
                           hint: "Heslo uživatele",
                           obscureText: true,
+                          enabled: (!this.lock),
                           onSubmit: (_) {
                           }
                         ).getWidget(),
@@ -96,16 +87,53 @@ class _UserScreen extends State<UserScreen> {
                             });
                           }
                         ).getWidget(),
-                        dropDownInput(
-                          label: "Akceptační místo",
-                          items:this.checkpointsItems,
-                          value:this.checkpointValue,
-                          onChanged: (_){
-                            setState(() {
-                              this.checkpointValue = _;
-                            });
-                          }
-                        ).getWidget(),
+                        FutureBuilder<dynamic>(
+                            future: futureCheckpoints,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                this.checkpointsItems = [DropdownMenuItem<String>(
+                                  value: "Akceptační místo",
+                                  child: Text("Akceptační místo"),
+                                )];
+                                for(var checkpoint in snapshot.data){
+                                  this.checkpointsItems!.add(
+                                    DropdownMenuItem<String>(
+                                      value: checkpoint["id"]!,
+                                      child:Text(checkpoint["name"]!, style: TextStyle(), overflow: TextOverflow.clip,),
+                                    ));
+                                }
+                                return dropDownInput(
+                                  label: "Akceptační místo",
+                                  items:this.checkpointsItems!,
+                                  value:this.checkpointValue,
+                                  onChanged: (_){
+                                    setState(() {
+                                      this.checkpointValue = _;
+                                    });
+                                  }
+                                ).getWidget();
+                              } else {
+                                return loadingCircle();
+                              }
+                            }
+                        ),
+                        SizedBox(height: 50),
+                        Container(
+                          height: 50,
+                          width: 250,
+                          decoration: BoxDecoration(
+                              color: Colors.redAccent,
+                              borderRadius: BorderRadius.circular(20)),
+                          child: MaterialButton(
+                            onPressed: () {
+                              this.handleSubmitForm();
+                            },
+                            child: Text(
+                              (this.user["id"]==0)?'Přidat uživatele':'Upravit uživatele',
+                              style: TextStyle(color: Colors.white, fontSize: 25),
+                            ),
+                          ),
+                        )
                       ],
                   ),
               ),
@@ -116,5 +144,48 @@ class _UserScreen extends State<UserScreen> {
         }
       }
     );
+  }
+  handleSubmitForm(){
+    dynamic dataUser = this.user;
+    dataUser['username'] = this.controllers["username"]!.text;
+    dataUser['password'] = this.controllers["password"]!.text;
+    dataUser['role'] = this.roleValue;
+    dataUser['checkpoint'] = this.checkpointValue;
+    setState(() {
+      this.lock=true;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      SnackBar snackBar = SnackBar(
+        content: Text("Ukládám"),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    });
+    Future<dynamic> response = Communication().updateUser(dataUser);
+    response.then((data){
+      dynamic user = this.user;
+      if ((data["user"]??null)!=null) {
+          user = data["user"];
+      }
+      setState(() {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        SnackBar snackBar = SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("Uživatel uložen"),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        this.user = user;
+        this.lock=false;
+      });
+    }).onError((error, stackTrace){
+      //TODO smthing went wrong
+      setState(() {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        SnackBar snackBar = SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text("Chyba při ukládání uživatele"),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        this.lock=false;
+      });
+    });
   }
 }

@@ -7,7 +7,6 @@ class RouteGuardAdmin extends AutoRedirectGuard {
   final AuthService authService;
   RouteGuardAdmin(this.authService) {
     authService.isAdmin = (Communication().storage.getItem("role")=="admin");
-    print(authService.isAdmin);
     authService.addListener(() {
       if (!authService.isAdmin) {
         // should be called when the logic effecting this guard changes
@@ -26,8 +25,11 @@ class RouteGuardAdmin extends AutoRedirectGuard {
   }
 
   @override
+
   Future<bool> canNavigate(RouteMatch route) {
     // TODO: implement canNavigate
-    throw UnimplementedError();
+    return Future.delayed(Duration.zero,(){
+      return true;
+    });
   }
 }

@@ -8,10 +8,10 @@ class AlertWindow {
   Color? color;
   String? title;
   IconData? icon;
-  Widget getWidget(){
+  Future<dynamic>? getWidget(){
     if ((this.show??false)) {
-      Future.delayed(Duration.zero,(){
-        showDialog(
+      return Future.delayed(Duration.zero,(){
+        return showDialog(
           context: context,
           builder: (context) {
             var height = MediaQuery.of(context).size.height;
@@ -75,7 +75,6 @@ class AlertWindow {
         );
       });
     }
-    return SizedBox.shrink();
   }
   clearProperties() {
     this.title = "";

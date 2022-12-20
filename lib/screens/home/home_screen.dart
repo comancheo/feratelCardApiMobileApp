@@ -6,11 +6,10 @@ import '/screens/parts/parts.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key);
-  final Future<bool> startLoading = Communication().handleOnstartLoading();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-        future: startLoading,
+        future: Communication().handleOnstartLoading(context: context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
@@ -22,6 +21,18 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 60.0),
+                        child: Center(
+                          child: Container(
+                              width: 200,
+                              height: 150,
+                              /*decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(50.0)),*/
+                              child: Image.asset('assets/images/svazek-logo.png')),
+                        ),
+                      ),
                       Text(
                         'Aplikace pro akceptaci karet hosta a občana',
                         style: TextStyle(

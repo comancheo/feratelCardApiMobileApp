@@ -35,6 +35,8 @@ class RouteGuard extends AutoRedirectGuard {
   @override
   Future<bool> canNavigate(RouteMatch route) {
     // TODO: implement canNavigate
-    throw UnimplementedError();
+    return Future.delayed(Duration.zero,(){
+      return true;
+    });
   }
 }

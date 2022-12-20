@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 class inputTextField{
-  inputTextField({this.onSubmit, this.controller, this.obscureText, required this.label, this.hint, this.autofocus});
+  inputTextField({this.onSubmit, this.controller, this.obscureText, required this.label, this.hint, this.autofocus, this.enabled});
   Function? onSubmit = (_){};
   TextEditingController? controller;
   bool? obscureText = false;
   bool? autofocus = false;
   String label;
   String? hint="";
+  bool? enabled;
   Widget getWidget() {
     return Padding(
       padding: const EdgeInsets.only(
@@ -14,6 +15,7 @@ class inputTextField{
       //padding: EdgeInsets.symmetric(horizontal: 15),
       child: TextField(
         autofocus: this.autofocus??false,
+        enabled: this.enabled,
         onSubmitted: (_){
           return this.onSubmit?.call(_);
         },

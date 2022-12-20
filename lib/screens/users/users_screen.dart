@@ -8,12 +8,11 @@ import '/routes/router.gr.dart';
 
 class UsersScreen extends StatelessWidget {
   UsersScreen({Key? key}) : super(key: key);
-  final Future<bool> startLoading = Communication().handleOnstartLoading();
   final Future<dynamic> users = Communication().getUsers();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-        future: startLoading,
+        future: Communication().handleOnstartLoading(context: context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
@@ -56,7 +55,8 @@ class UsersScreen extends StatelessWidget {
                     "username":"",
                     "password":"",
                     "role":"user",
-                    "checkpoint":"Akceptační místo"
+                    "checkpoint":"Akceptační místo",
+                    "id":0
                   };
                   AutoRouter.of(context).push(UserRoute(user:blankUser));
                   Navigator.pop(context);

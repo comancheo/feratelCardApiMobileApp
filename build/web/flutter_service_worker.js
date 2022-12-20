@@ -3,10 +3,10 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "main.dart.js": "ce354c7724029d661b7c094e75a702e5",
+  "main.dart.js": "e296c9e3a6fc440971dc374289fba84b",
 "flutter.js": "f85e6fb278b0fd20c349186fb46ae36d",
-"index.html": "6e749325111c8eea78e0857fe7728124",
-"/": "6e749325111c8eea78e0857fe7728124",
+"index.html": "325da39f220a529be19c53dd0c658e18",
+"/": "325da39f220a529be19c53dd0c658e18",
 "version.json": "ff966ab969ba381b900e61629bfb9789",
 "favicon.png": "5dcef449791fa27946b3d35ad8803796",
 "canvaskit/canvaskit.js": "2bc454a691c631b07a9307ac4ca47797",
@@ -26,7 +26,7 @@ const RESOURCES = {
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "6d342eb68f170c97609e9da345464e5e",
 "manifest.json": "15f73b7e8a8209c2206210b3ac8dea1b",
 "favicon.ico": "8180becfd3be8ad6c55c965864fbfa8f",
-"feratelAPI.php": "2b88951d3934411aeffddb6dd47e70eb"
+"feratelAPI.php": "106dc674c6486d349bfbb2aba1318c60"
 };
 
 // The application shell files that are downloaded before a service worker can

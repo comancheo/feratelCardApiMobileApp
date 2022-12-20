@@ -23,12 +23,11 @@ class _LoginScreen extends State<LoginScreen> {
   TextEditingController qrloginController = TextEditingController();
   String loginProgress = 'showForm';
   String error = "";
-  final Future<bool> startLoading = Communication().handleOnstartLoading();
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-        future: startLoading,
+        future: Communication().handleOnstartLoading(context: context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
@@ -115,7 +114,7 @@ class _LoginScreen extends State<LoginScreen> {
     );
   }
 
-  Widget errorText(String errorText) {
+  errorText(String errorText) {
     return AlertWindow(
       show: true,
       context: context,
@@ -129,7 +128,7 @@ class _LoginScreen extends State<LoginScreen> {
   List<Widget> showBody() {
     List<Widget> members = [];
     if (this.error != "") {
-      members.add(this.errorText(this.error));
+      this.errorText(this.error);
       this.error = "";
     }
     if (this.loginProgress == "loading") {
@@ -143,7 +142,13 @@ class _LoginScreen extends State<LoginScreen> {
   handleSubmitLogin() {
     if ((this.usernameController.text == "" ||
             this.passwordController.text == "") &&
-        this.qrloginController == "") {
+        this.qrloginController.text == "") {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      SnackBar snackBar = SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text("Vyplňte jméno a heslo!"),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
     }
     setState(() {

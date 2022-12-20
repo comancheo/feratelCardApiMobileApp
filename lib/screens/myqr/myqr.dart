@@ -5,12 +5,11 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 class MyQRScreen extends StatelessWidget {
   MyQRScreen({Key? key}) : super(key: key);
-  final Future<bool> startLoading = Communication().handleOnstartLoading();
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-        future: startLoading,
+        future: Communication().handleOnstartLoading(context: context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Scaffold(

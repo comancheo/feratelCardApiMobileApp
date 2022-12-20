@@ -19,15 +19,14 @@ class Communication {
   Map<String, String> Checkpoints = {};
   bool loggedIn = false;
   bool isStorageReady = false;
+  BuildContext? currentContext;
 
-  Future<bool> handleOnstartLoading(){
+  Future<bool> handleOnstartLoading({context}){
+    this.currentContext = context;
     return this.storage.ready.then((_){
       return this.tryRelogin((_){
         MyApp.of(applicationKey.currentContext!).authService.authenticated = Communication().amILoggedIn();
         MyApp.of(applicationKey.currentContext!).authService.isAdmin = (Communication().storage.getItem("role")=="admin");
-        if (Communication().amILoggedIn()) {
-          return this.loadCheckpoints();
-        }
         return this.amILoggedIn();
       });
     });
@@ -43,28 +42,34 @@ class Communication {
   }
 
   logout (Function callable) {
-    Future<dynamic> response = this.callServer('logout/',{});
+    Future<dynamic> response = this.callServer('logout/',{"sectoken":Communication().storage.getItem("sectoken")});
     this.storage.setItem("login",null);
     this.storage.setItem("checkpoint",null);
     this.storage.setItem("checkpointName",null);
     this.storage.setItem("sectoken",null);
     this.storage.setItem("role",null);
     this.loggedIn = false;
-    MyApp.of(applicationKey.currentContext!).authService.authenticated = Communication().amILoggedIn();
-    MyApp.of(applicationKey.currentContext!).authService.isAdmin = (Communication().storage.getItem("role")=="admin");
+    MyApp.of(applicationKey.currentContext!).authService.authenticated = false;
+    MyApp.of(applicationKey.currentContext!).authService.isAdmin = false;
     return response.then((r){
-      if (r['logout']=="OK") {}
+      try{
+        if (r['logout']=="OK") {
+
+        }
+      } catch(e){
+
+      }
       callable.call(this.amILoggedIn());
       return this.amILoggedIn();
     });
   }
 
-  loadCheckpoints(){
+  Future<dynamic>loadCheckpoints(){
     Future<dynamic> response = this.callServer('checkpoints/',{"sectoken":this.storage.getItem("sectoken")});
     return response.then((r){
       if (r['checkpoints']!="ERROR") {
         this.storage.setItem("checkpoints", r['checkpoints']);
-        return this.amILoggedIn();
+        return r['checkpoints'];
       }
     });
   }
@@ -108,6 +113,9 @@ class Communication {
     final response = this.callServer("checkcard/",data);
     response.then((r){
       callback.call(r);
+    }).onError((error, stackTrace){
+      dynamic r = {"card":"ERROR", "data":{"valid":false}};
+      callback.call(r);
     });
   }
   String getLoginQRData(){
@@ -129,33 +137,37 @@ class Communication {
       'sectoken': this.storage.getItem("sectoken")
     });
   }
-  dynamic callServer(String url, dynamic parameters) async {
-    try {
-      final response = await http.post(
+  Future<dynamic> updateUser(user){
+    var data = {"user":user, "sectoken":this.storage.getItem("sectoken")};
+    Future<dynamic> response = this.callServer("updateuser", data);
+    return response.then((r){
+      return r;
+    });
+  }
+  Future<dynamic> callServer(String url, dynamic parameters) async {
+      Future<dynamic> response = http.post(
         Uri.parse('https://svazekapi.tabor-belun.cz/feratelAPI.php/'+url),
         headers: <String, String>{
           'Content-Type':'application/json; charset=UTF-8',
         },
         body: jsonEncode(parameters),
         encoding: Encoding.getByName("utf-8"),
-      );
-      dynamic data = jsonDecode(response.body);
-      if (data['status'] == 'OK') {
-        return data;
-      }
-    } catch (e) {
-      if (this.applicationKey.currentContext!=null) {
-        AlertWindow(
-          context: this.applicationKey.currentContext!,
-          show:true,
-          message: "Chyba komunikace, zkuste to pouzději",
-          color:Colors.redAccent,
-          title: "Chyba komunikace",
-          icon: Icons.warning
-        ).getWidget();
-      }
-      //TODO Error communication
-    }
-    return {'login':'ERROR'};
+      ).then((response){
+        dynamic data = jsonDecode(response.body);
+        if (data['status'] == 'OK') {
+          return data;
+        } else {
+          throw new Exception("Chyba komunikace!");
+        }
+      }).onError((error, stackTrace){
+        throw new Exception("Chyba komunikace!");
+      }).catchError((error){
+        print(error);
+        SnackBar snackBar = SnackBar(
+          content: Text(error.toString()),
+        );
+        ScaffoldMessenger.of(this.currentContext!).showSnackBar(snackBar);
+      });
+      return response;
   }
 }

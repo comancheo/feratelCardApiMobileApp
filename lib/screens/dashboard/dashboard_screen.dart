@@ -16,7 +16,6 @@ class _DashboardScreen extends State<DashboardScreen> {
   String? code;
   AlertWindow? alertWindow;
   Future<bool>? camAvailableF;
-  final Future<bool> startLoading = Communication().handleOnstartLoading();
 
   @override
   void initState() {
@@ -33,7 +32,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     AlertWindow alert = this.alertWindow??AlertWindow(context: context);
     return FutureBuilder<bool>(
-        future: startLoading,
+        future: Communication().handleOnstartLoading(context:context),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return this.body(context);
@@ -118,9 +117,6 @@ class _DashboardScreen extends State<DashboardScreen> {
                 }
               },
             ));
-      if(this.alertWindow!=null){
-        members.add(this.alertWindow!.getWidget());
-      }
       members.add(
             inputTextField(
                 label: "Číslo karty",
@@ -143,12 +139,10 @@ class _DashboardScreen extends State<DashboardScreen> {
       this.loading = true;
     });
     return Communication().checkCardValidity(this.code??"", (result){
-      AlertWindow alert = AlertWindow(context: context);
+      AlertWindow? alert;
         if (result['card'] == "OK" && result['data']['valid'] == true) {
           String message = "";
-          print(result['service']);
           for (var service in result['service']){
-            print(service["type"]["translations"]);
             for(var translation in service["type"]["translations"]){
               String tmpMessage;
               if (translation['language'] == 'cs') {
@@ -176,15 +170,22 @@ class _DashboardScreen extends State<DashboardScreen> {
           );
         }
         setState(() {
-          this.alertWindow = alert;
+          alert!.getWidget();
           this.loading = false;
           this.inputCodeController.text = "";
+          this.code = "";
         });
     });
   }
 
   void handleSubmitCode() async {
     if (this.code == "") {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      SnackBar snackBar = SnackBar(
+        backgroundColor: Colors.redAccent,
+        content: Text("Vyplňte nebo naskenujte kód"),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return;
     }
     bool isValid = await this.isCardValid();

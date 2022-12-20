@@ -42,7 +42,7 @@ class feratelAPI
     const API_URL = "https://card-check-api.feratel.com:443/v1/".self::API_TENANT."/secure/checkpoints/";
     const API_USERNAME = "api_comancheo";
     const API_PASSWORD = "Phphtml213";
-    const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints', 'handleLogout','handleUsers'];
+    const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints', 'handleLogout','handleUsers','handleUpdateuser'];
 
     private $json = [];
 
@@ -130,6 +130,26 @@ class feratelAPI
     private function logout(){
         //TODO
     }
+    public function handleUpdateuser($request){
+        if ($this->user['role'] !== "admin") {
+            return $this->setResponse("OK", ["updateUser"=>"ERROR", "message"=>"Nemáte dostatečná práva"]);
+        }
+        $dataUser = $this->getJson("user");
+        unset($dataUser['checkpointName']);
+        $dataUser['password'] = trim($dataUser['password']??"");
+        if ($dataUser['password']) {
+            $dataUser['password'] = password_hash($dataUser['password'], PASSWORD_DEFAULT);
+            $dataUser['sectoken'] = password_hash($dataUser['username'].$dataUser['password'], PASSWORD_DEFAULT);
+        } else {
+            unset($dataUser['password']);
+            unset($dataUser['sectoken']);
+        }
+        if ($dataUser['id']==0) {
+            unset($dataUser['id']);
+        }
+        $query = $this->storeUser($dataUser);
+        return $this->setResponse("OK", ["updateUser"=>"OK", "user"=>$dataUser, "message"=>"Přidán nový uživatel ".$dataUser['username']]);
+    }
     public function handleCheckcard($request){
         $params = [
             'checkPointId'=>$this->getJson('checkPointId'),
@@ -180,6 +200,9 @@ class feratelAPI
         static $checkpoints;
         if (!$checkpoints) {
             $checkpoints = $this->getApiResponse([]);
+            foreach ($checkpoints as &$checkpoint){
+                $checkpoint['name'] = str_replace("","ž",$checkpoint['name']);
+            }
         }
         return $checkpoints;
     }
@@ -327,9 +350,19 @@ class feratelAPI
         return $users;
     }
     private function storeUser($user) {
-        $user['password'] = password_hash($user['password'],PASSWORD_DEFAULT);
-        $user['sectoken'] = password_hash($user['username'].$user['password'],PASSWORD_DEFAULT);
-        $this->db->prepare("INSERT INTO svazek_users (username, password, role, checkpoint) VALUES (:username, :password, :role, :checkpoint)")->execute($user);
+        $keys = array_keys($user);
+        $update = [];
+        foreach($keys as $key){
+            if ($key=="id") {
+                continue;
+            }
+            $update[] = $key."=:".$key;
+        }
+        $query = "INSERT INTO svazek_users (".implode(",",$keys).")
+        VALUES (:".implode(",:",$keys).") 
+        ON DUPLICATE KEY UPDATE ".implode(",",$update);
+        $this->db->prepare($query)->execute($user);
+        return $query;
     }
 
     private function authUser($login){
