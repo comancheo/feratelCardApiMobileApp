@@ -52,18 +52,7 @@ class _LoginScreen extends State<LoginScreen> {
     return Form(
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 60.0),
-            child: Center(
-              child: Container(
-                  width: 200,
-                  height: 150,
-                  /*decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(50.0)),*/
-                  child: Image.asset('assets/images/svazek-logo.png')),
-            ),
-          ),
+          logoPart(),
           inputTextField(
             label: "Jméno",
             controller: this.usernameController,
@@ -115,14 +104,17 @@ class _LoginScreen extends State<LoginScreen> {
   }
 
   errorText(String errorText) {
-    return AlertWindow(
+    Communication().popDialog(
       show: true,
       context: context,
       color: Colors.redAccent,
       title: "Nepodařilo se Vás přihlásit",
       icon: Icons.warning,
       message: errorText,
-    ).getWidget();
+      route:LoginRoute(
+        onLoginCallback: this.onLoginCallback,
+      )
+    );
   }
 
   List<Widget> showBody() {

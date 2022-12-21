@@ -1,4 +1,4 @@
-# example
+# akceptace_karet_krajina_pod_snezkou
 
 Start with:
 

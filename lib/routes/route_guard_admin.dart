@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:example/util/communication.dart';
+import 'package:akceptace_karet_krajina_pod_snezkou/util/communication.dart';
 import '/routes/router.gr.dart';
 import '/util/auth_service.dart';
 

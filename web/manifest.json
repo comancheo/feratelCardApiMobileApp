@@ -1,11 +1,11 @@
 {
-    "name": "example",
-    "short_name": "example",
+    "name": "akceptace_karet_krajina_pod_snezkou",
+    "short_name": "akceptace_karet_krajina_pod_snezkou",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Akceptace karet pomocí QR kódu.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
@@ -16,6 +16,11 @@
         },
         {
             "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/snezka.png",
             "sizes": "512x512",
             "type": "image/png"
         }

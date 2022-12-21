@@ -1,4 +1,4 @@
-import 'package:example/util/communication.dart';
+import 'package:akceptace_karet_krajina_pod_snezkou/util/communication.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import '/routes/router.gr.dart';
@@ -21,18 +21,7 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 60.0),
-                        child: Center(
-                          child: Container(
-                              width: 200,
-                              height: 150,
-                              /*decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.circular(50.0)),*/
-                              child: Image.asset('assets/images/svazek-logo.png')),
-                        ),
-                      ),
+                      logoPart(),
                       Text(
                         'Aplikace pro akceptaci karet hosta a občana',
                         style: TextStyle(

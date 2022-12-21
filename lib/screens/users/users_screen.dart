@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:example/util/communication.dart';
+import 'package:akceptace_karet_krajina_pod_snezkou/util/communication.dart';
 import 'package:flutter/material.dart';
 import '/screens/parts/parts.dart';
 import 'package:auto_route/auto_route.dart';

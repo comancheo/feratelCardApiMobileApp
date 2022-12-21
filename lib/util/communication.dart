@@ -12,6 +12,7 @@ class Communication {
   final LocalStorage storage = new LocalStorage('feratelAppLogin');
   @override
   final GlobalKey<NavigatorState> applicationKey = new GlobalKey<NavigatorState>();
+  final AlertWindow alertWindow = AlertWindow();
   factory Communication() {
     return _communication;
   }
@@ -111,11 +112,11 @@ class Communication {
       'identifier':code
     };
     final response = this.callServer("checkcard/",data);
-    response.then((r){
-      callback.call(r);
+    return response.then((r){
+       return callback.call(r);
     }).onError((error, stackTrace){
       dynamic r = {"card":"ERROR", "data":{"valid":false}};
-      callback.call(r);
+      return callback.call(r);
     });
   }
   String getLoginQRData(){
@@ -169,5 +170,29 @@ class Communication {
         ScaffoldMessenger.of(this.currentContext!).showSnackBar(snackBar);
       });
       return response;
+  }
+  popDialog({ required BuildContext? context,
+      bool? show = false,
+      String? message,
+      Color? color,
+      String? title,
+      IconData? icon,
+      Widget? widgetContent,
+      Function? runCallBack,
+      dynamic route
+  }){
+    this.alertWindow.context = context;
+    this.alertWindow.show = show;
+    this.alertWindow.message = message;
+    this.alertWindow.color = color;
+    this.alertWindow.title = title;
+    this.alertWindow.icon = icon;
+    this.alertWindow.route = route;
+    this.alertWindow.runCallBack = runCallBack;
+    this.alertWindow.widgetContent = widgetContent;
+    this.alertWindow.popWindow();
+  }
+  closeDialog(){
+    this.alertWindow.closeDialog();
   }
 }

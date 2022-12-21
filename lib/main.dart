@@ -1,5 +1,5 @@
-import 'package:example/routes/router.gr.dart';
-import 'package:example/util/communication.dart';
+import '/routes/router.gr.dart';
+import '/util/communication.dart';
 import 'package:flutter/material.dart';
 import '/routes/route_guard.dart';
 import '/routes/route_guard_admin.dart';

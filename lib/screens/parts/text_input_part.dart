@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 class inputTextField{
-  inputTextField({this.onSubmit, this.controller, this.obscureText, required this.label, this.hint, this.autofocus, this.enabled});
+  inputTextField({this.onSubmit, this.controller, this.obscureText, required this.label, this.hint, this.autofocus, this.enabled, this.focusNode});
   Function? onSubmit = (_){};
   TextEditingController? controller;
   bool? obscureText = false;
@@ -8,6 +8,7 @@ class inputTextField{
   String label;
   String? hint="";
   bool? enabled;
+  FocusNode? focusNode;
   Widget getWidget() {
     return Padding(
       padding: const EdgeInsets.only(
@@ -16,6 +17,7 @@ class inputTextField{
       child: TextField(
         autofocus: this.autofocus??false,
         enabled: this.enabled,
+        focusNode: this.focusNode,
         onSubmitted: (_){
           return this.onSubmit?.call(_);
         },

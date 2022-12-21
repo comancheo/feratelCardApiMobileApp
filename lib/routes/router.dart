@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:example/screens/myqr/myqr.dart';
+import 'package:akceptace_karet_krajina_pod_snezkou/screens/myqr/myqr.dart';
 import '/routes/route_guard.dart';
 import '/routes/route_guard_admin.dart';
 import '/screens/about/about_screen.dart';

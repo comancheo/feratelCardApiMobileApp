@@ -158,7 +158,9 @@ class feratelAPI
         ];
         $data = $this->getApiResponse($params);
         if (!$data['identification']){
-            return false;
+            return $this->setResponse('OK', [
+                'card'=>'ERROR'
+            ]);
         }
         $info = $data['identification'];
         $from = strtotime($info['fromDate']);

@@ -1,7 +1,8 @@
-import 'package:example/util/communication.dart';
+import '/util/communication.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import '/routes/router.gr.dart';
+import '/screens/parts/parts.dart';
 Drawer DrawerPart(context) {
   return Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -12,12 +13,26 @@ Drawer DrawerPart(context) {
           padding: EdgeInsets.zero,
           children: [
             ListTile(
+              title:  Padding(
+                padding:  EdgeInsets.only(top: 0.0),
+                child: Center(
+                  child: Container(
+                      height: 50,
+                      child: Image.asset('assets/images/snezka.png')
+                  ),
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
               title: const Text('Domů'),
               onTap: () {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                AutoRouter.of(context).push(HomeRoute());
+                AutoRouter.of(context).replace(HomeRoute());
                 Navigator.pop(context);
               },
             ),
@@ -27,7 +42,7 @@ Drawer DrawerPart(context) {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                AutoRouter.of(context).push(AboutRoute());
+                AutoRouter.of(context).replace(AboutRoute());
                 Navigator.pop(context);
               },
             ),
@@ -37,7 +52,7 @@ Drawer DrawerPart(context) {
                 // Update the state of the app
                 // ...
                 // Then close the drawer
-                AutoRouter.of(context).push(DashboardRoute());
+                AutoRouter.of(context).replace(DashboardRoute());
                 Navigator.pop(context);
               },
             ),
@@ -57,7 +72,7 @@ Drawer DrawerPart(context) {
             if (Communication().amILoggedIn()) ListTile(
               title: const Text('QR pro přihlášení'),
               onTap: () {
-                AutoRouter.of(context).push(
+                AutoRouter.of(context).replace(
                     MyQRScreenRoute()
                 );
                 Navigator.pop(context);
@@ -66,7 +81,7 @@ Drawer DrawerPart(context) {
             if (Communication().storage.getItem("role")=="admin") ListTile(
               title: const Text('Uživatelé'),
               onTap: () {
-                AutoRouter.of(context).push(
+                AutoRouter.of(context).replace(
                     UsersRoute()
                 );
                 Navigator.pop(context);

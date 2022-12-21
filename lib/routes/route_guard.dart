@@ -1,5 +1,5 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:example/util/communication.dart';
+import '/util/communication.dart';
 import '/routes/router.gr.dart';
 import '/util/auth_service.dart';
 
