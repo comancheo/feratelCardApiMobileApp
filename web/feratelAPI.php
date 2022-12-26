@@ -40,6 +40,7 @@ class feratelAPI
     const API_TENANT = "kpc01";
     const GRANT_TYPE = "password";
     const API_URL = "https://card-check-api.feratel.com:443/v1/".self::API_TENANT."/secure/checkpoints/";
+    const CHECKPOINTS_SERVICES_EXCEPTIONS = ["1d997ac6-61a0-4de6-a435-a4f7fed479a7","49f41c4b-577a-48cb-9887-6c880dbd8d3b","20ad6330-4363-46c1-9d39-3b289aa91e14"];
     const API_USERNAME = "api_comancheo";
     const API_PASSWORD = "Phphtml213";
     const ALLOWED_METHODS = ['handleLogin','handleCheckcard', 'handleCheckpoints', 'handleLogout','handleUsers','handleUpdateuser'];
@@ -109,6 +110,7 @@ class feratelAPI
             'login'=>'OK',
             'checkpoint' => $user['checkpoint'],
             'checkpointName' => $this->getCheckpointById($user['checkpoint'])['name'],
+            'checkpointData' => $this->getCheckpointById($user['checkpoint']),
             'role' => $user['role'],
             'sectoken'=>$user['sectoken']
         ]);
@@ -156,10 +158,12 @@ class feratelAPI
             'check'=>'check',
             'identifier'=>$this->getJson('identifier'),
         ];
-        $data = $this->getApiResponse($params);
+        $data = $this->getApiResponse($params, (in_array($this->getJson('checkPointId'),self::CHECKPOINTS_SERVICES_EXCEPTIONS))?"POST":"GET");
         if (!$data['identification']){
             return $this->setResponse('OK', [
-                'card'=>'ERROR'
+                'card'=>'ERROR',
+                'data'=>$data,
+                'service' => null,
             ]);
         }
         $info = $data['identification'];
@@ -169,15 +173,51 @@ class feratelAPI
         if ($now < $from && $now > $to) {
             return $this->setResponse('OK', [
                 'card'=>'ERROR',
-                'cardValidTo'=>0
+                'cardValidTo'=>0,
+                'data'=>$data,
+                'service' => null,
             ]);
         }
-        return $this->setResponse('OK', [
+
+        $services = $data['checkPoint']['serviceTypeAssignments'];
+        foreach($services as &$service){
+            $service['valid'] = $data['valid'];
+        }
+        if (!in_array($this->getJson('checkPointId'),self::CHECKPOINTS_SERVICES_EXCEPTIONS)) {
+            $checkpoint = $this->getCheckpointById($this->getJson('checkPointId'));
+            $services = $checkpoint['serviceTypeAssignments'];
+        }
+        $response = $this->setResponse('OK', [
             'card'=>'OK',
             'cardValidTo' => $to,
-            'service' => $data['checkPoint']['serviceTypeAssignments'],
+            'service' => $services,
             'data' => $data
         ]);
+        if (!in_array($this->getJson('checkPointId'),self::CHECKPOINTS_SERVICES_EXCEPTIONS)) {
+            $response = $this->checkCardPerService($response);
+        }
+        return $response;
+    }
+    private function checkCardPerService($response){
+        $response['data']['valid'] = false;
+        foreach ($response['service'] as &$service) {
+            $checkCardService = $this->checkCardByService($service["type"]['id']);
+            $service['valid'] = $checkCardService['valid'];
+            if ($checkCardService['valid']) {
+                $response['data']['valid'] = true;
+            }
+        }
+        return $response;
+    }
+
+    private function checkCardByService($serviceTypeId){
+        $params = [
+            'checkPointId'=>$this->getJson('checkPointId'),
+            'check'=>'check',
+            'identifier'=>$this->getJson('identifier'),
+            "serviceTypeId"=>$serviceTypeId
+        ];
+        return $this->getApiResponse($params, "GET");
     }
     public function handleCheckpoints(){
         if (!$this->getCheckpoints()) {
@@ -189,7 +229,7 @@ class feratelAPI
         $checkpoints = $this->getCheckpoints();
         foreach ($checkpoints as $point){
             if ($point['id']==$id) {
-                return $point;
+                return $this->getCheckpointData($id);
             }
         }
         return false;
@@ -202,25 +242,29 @@ class feratelAPI
         static $checkpoints;
         if (!$checkpoints) {
             $checkpoints = $this->getApiResponse([]);
-            foreach ($checkpoints as &$checkpoint){
-                $checkpoint['name'] = str_replace("","ž",$checkpoint['name']);
-            }
         }
         return $checkpoints;
     }
-    private function getApiResponse($params){
+    private function getCheckpointData($id){
+        $params = [
+            'checkPointId'=>$id,
+        ];
+        return $this->getApiResponse($params);
+    }
+    private function getApiResponse($params, $method = "GET"){
         $header = [
             'Accept: application/json',
             'Authorization: Bearer '.$this->getToken()['access_token'],
         ];
         $ch = curl_init($this->getApiUrl($params));
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($ch);
+        $response = str_replace("","ž",$response); //ž repair
         $data = json_decode($response ?? '',true) ?? [];
         $info = curl_getinfo($ch);
-        if (in_array($info['http_code'] ?? null, [200, 201, 202])) {
+        if (in_array($info['http_code'] ?? null, [200, 201, 202,401])) {
             return $data;
         }
         return [];
@@ -236,6 +280,9 @@ class feratelAPI
             return $url;
         }
         $url .= $p['check']."/";
+        if ($p['serviceTypeId']) {
+        $url .= $p['serviceTypeId']."/";
+        }
         if (!$p['identifier']) {
             return $url;
         }

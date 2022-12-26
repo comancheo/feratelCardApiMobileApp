@@ -44,10 +44,29 @@ class AlertWindow {
                   .size
                   .width;
               var ret = AlertDialog(
+                scrollable: true,
                 insetPadding: EdgeInsets.all(5),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10.0))),
                 backgroundColor: this.color,
+                actions: [
+                  Container(
+                    height: 50,
+                    width: 250,
+                    decoration: BoxDecoration(
+                        color: (this.color == Colors.redAccent)?Colors.white:Colors.redAccent,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: MaterialButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Center(child:Text(
+                        'Ok',
+                        style: TextStyle(color: (this.color == Colors.redAccent)?Colors.black:Colors.white, fontSize: 25),
+                      )),
+                    ),
+                  )
+                ],
                 title: Row(children: [
                   Icon(
                     this.icon,
@@ -80,11 +99,17 @@ class AlertWindow {
                           ))),
                 ]),
                 content: Container(
-                    width: width * 0.5,
-                    height: height * 0.5,
-                    child: Column(
+                    width: width * 0.85,
+                    height: height * 0.85,
+                    constraints: BoxConstraints(
+                      maxHeight:  height * 0.9,
+                      minHeight:  height * 0.8,
+                      maxWidth:  width * 0.9,
+                      minWidth:  width * 0.8,
+                    ),
+                    child: SingleChildScrollView(child:Column(
                       children: this.getContent(),
-                    )),
+                    ))),
               );
               this.clearProperties();
               if (this.runCallBack != null) {

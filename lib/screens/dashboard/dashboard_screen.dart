@@ -141,6 +141,57 @@ class _DashboardScreen extends State<DashboardScreen> {
             ).getWidget());
     return members;
   }
+  Row messageTextTitle(text){
+    return Row(children:[Flexible(child:Text(text,style: TextStyle(
+              color: Colors.white,
+              fontSize: 25,
+              shadows: <Shadow>[
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 1.0,
+                  color: Color.fromARGB(127, 0, 0, 0),
+                ),
+              ],
+            )))]);
+  }
+  Row messageText({required String text, String type = ""}){
+    IconData icon = Icons.disc_full;
+    if (type == "ok") {
+      icon = Icons.check;
+    } else if (type == "error"){
+      icon = Icons.error;
+    }
+    return Row(children:[
+      Icon(icon, color:Colors.white,size:20),
+      SizedBox(width:20),
+      Flexible(child:Text(text, textAlign: TextAlign.left, maxLines: 4, softWrap: true,style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              shadows: <Shadow>[
+                Shadow(
+                  offset: Offset(0.0, 0.0),
+                  blurRadius: 1.0,
+                  color: Color.fromARGB(127, 0, 0, 0),
+                ),
+              ],
+            )))]);
+  }
+  List<Row> serviceMessage(services){
+    List<Row> message = [];
+    for (var service in services){
+      for(var translation in service["type"]["translations"]){
+        String tmpMessage = "";
+        if (service["valid"]) {
+          tmpMessage = "";
+        }
+        if (translation['language'] == 'cs') {
+          tmpMessage = tmpMessage+translation['name'];
+          message.add(this.messageText(text:tmpMessage, type:(service['valid'])?"ok":"error"));
+        }
+      }
+    }
+    return message;
+  }
   dynamic isCardValid() async {
     setState(() {
       this.codeHandled = true;
@@ -156,29 +207,46 @@ class _DashboardScreen extends State<DashboardScreen> {
     await Communication().checkCardValidity(this.code??"", (result){
       Map aP = {};
       bool ret = false;
+      List<Row> message = [];"\n";
         if (result['card'] == "OK" && result['data']['valid'] == true) {
           ret = true;
-          String message = "";
-          for (var service in result['service']){
-            for(var translation in service["type"]["translations"]){
-              String tmpMessage;
-              if (translation['language'] == 'cs') {
-                tmpMessage = translation['name']+"\n";
-                message = message + tmpMessage;
-              }
-            }
+          if (result["service"]!=null) {
+            message = this.serviceMessage(result["service"]);
           }
           aP = {
-            "message": "Karta je validní\n" + message,
+            "message":null,
+            "widgetContent": Column(children:message),
             "color": Colors.green,
-            "title": "Karta je validní",
+            "title": "Karta přijata",
             "icon": Icons.check,
           };
         } else {
+          if (result['card'] == "OK") {
+            if (result["service"]!=null && result["service"].length > 0) {
+              List<Row> messages = this.serviceMessage(result["service"]);
+              for (Row m in messages) {
+                message.add(m);
+              }
+            } else {
+              message.add(this.messageTextTitle("Karta je platná, ale:"));
+              for(var translation in result['data']['checkState']['translations']){
+                //tick -> "✓"
+                //cross -> "✓"
+                String tmpMessage;
+                if (translation['language'] == 'cs') {
+                  tmpMessage = translation['name'];
+                  message.add(this.messageText(text:tmpMessage));
+                }
+              }
+            }
+          } else{
+            message.add(this.messageTextTitle("Karta není platná."));
+          }
           aP = {
-            "message": "Karta není validní",
+            "message": null,
+            "widgetContent": Column(children:message),
             "color": Colors.redAccent,
-            "title": "Karta není validní",
+            "title": "Karta nepřijata!",
             "icon": Icons.warning,
           };
         }
@@ -186,6 +254,7 @@ class _DashboardScreen extends State<DashboardScreen> {
           Communication().popDialog(
             context: Communication().currentContext!,
             show:true,
+            widgetContent: aP["widgetContent"],
             message: aP["message"],
             color: aP["color"],
             title: aP["title"],
