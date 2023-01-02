@@ -15,6 +15,7 @@ class _DashboardScreen extends State<DashboardScreen> {
   TextEditingController inputCodeController = TextEditingController();
   String? code;
   Future<bool>? camAvailableF;
+  bool forceAutofocus = true;
   late FocusNode? focusNode;
 
   @override
@@ -35,9 +36,11 @@ class _DashboardScreen extends State<DashboardScreen> {
     this.focusNode!.dispose();
   }
   focusHandler(){
-    if (!this.focusNode!.hasFocus) {
-      Communication().currentContext!;
-      focusNode!.requestFocus();
+    if (this.forceAutofocus) {
+      if (!this.focusNode!.hasFocus) {
+        Communication().currentContext!;
+        focusNode!.requestFocus();
+      }
     }
   }
   @override
@@ -63,7 +66,28 @@ class _DashboardScreen extends State<DashboardScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Expanded(
+              child: Container(
+              ),
+            ),
             ...this.showBody(),
+            Expanded(
+              child: Container(
+              ),
+            ),
+            Row(children: [
+              Text("Stálé vkládání"),
+              Switch(
+                value: this.forceAutofocus,
+                activeColor: Colors.red,
+                onChanged: (bool value) {
+                  // This is called when the user toggles the switch.
+                  setState(() {
+                    this.forceAutofocus = value;
+                  });
+                },
+              )
+            ],),
           ],
         ),
       ),
@@ -129,7 +153,7 @@ class _DashboardScreen extends State<DashboardScreen> {
             inputTextField(
                 label: "Číslo karty",
                 hint: "Vložte číslo karty nebo ho naskenujte",
-                autofocus: false,
+                autofocus: !this.forceAutofocus,
                 focusNode: this.focusNode,
                 controller: this.inputCodeController,
                 onSubmit: (_){
@@ -211,13 +235,14 @@ class _DashboardScreen extends State<DashboardScreen> {
         if (result['card'] == "OK" && result['data']['valid'] == true) {
           ret = true;
           if (result["service"]!=null) {
-            message = this.serviceMessage(result["service"]);
+            message.add(this.messageTextTitle("Aktivní Karta\nDržiteli náleží:"));
+            message = [...message,...this.serviceMessage(result["service"])];
           }
           aP = {
             "message":null,
             "widgetContent": Column(children:message),
             "color": Colors.green,
-            "title": "Karta přijata",
+            "title": "Platná akceptace",
             "icon": Icons.check,
           };
         } else {
@@ -228,14 +253,14 @@ class _DashboardScreen extends State<DashboardScreen> {
                 message.add(m);
               }
             } else {
-              message.add(this.messageTextTitle("Karta je platná, ale:"));
               for(var translation in result['data']['checkState']['translations']){
-                //tick -> "✓"
-                //cross -> "✓"
                 String tmpMessage;
                 if (translation['language'] == 'cs') {
                   tmpMessage = translation['name'];
-                  message.add(this.messageText(text:tmpMessage));
+                  tmpMessage=tmpMessage.replaceAll('Identification not valid', 'Neplatná Karta\njejí platnost již vypršela');
+                  tmpMessage=tmpMessage.replaceAll('Permission not granted (INCL/BOOK)', 'Neplatná Karta\ndnes již byla jednou akceptována');
+                  tmpMessage=tmpMessage.replaceAll('Double use entry - service-lockdown not expired (INCL)', 'Neplatná Karta\nbyla před chvilkou akceptována');
+                  message.add(this.messageText(text:tmpMessage, type: "error"));
                 }
               }
             }
@@ -246,7 +271,7 @@ class _DashboardScreen extends State<DashboardScreen> {
             "message": null,
             "widgetContent": Column(children:message),
             "color": Colors.redAccent,
-            "title": "Karta nepřijata!",
+            "title": "Neplatná akceptace",
             "icon": Icons.warning,
           };
         }

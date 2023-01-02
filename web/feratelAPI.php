@@ -262,12 +262,16 @@ class feratelAPI
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $response = curl_exec($ch);
         $response = str_replace("","ž",$response); //ž repair
+        /*$response = str_replace("Identification not valid","Neplatná Karta
+její platnost již vypršela",$response); //ž repair
+        $response = str_replace("Permission not granted (INCL/BOOK)","Neplatná Karta
+dnes již byla jednou akceptována",$response);*/
         $data = json_decode($response ?? '',true) ?? [];
         $info = curl_getinfo($ch);
         if (in_array($info['http_code'] ?? null, [200, 201, 202,401])) {
             return $data;
         }
-        return [];
+        return $data;
     }
 
     private function getApiUrl($p){
